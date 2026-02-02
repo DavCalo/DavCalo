@@ -4,7 +4,7 @@
 
 ## 💫 About Me:
 🛰️ Currently working on **Alba CubeSat** university project (starting **November 2025**)  
-🚀 Contributing to **space technology development**
+🚀 Contributing to **space technology development**<br/>
 🎓 Attending bachelor's degree in **Computer Engineering**  
 🌱 Currently learning databases & networking
 
@@ -17,7 +17,7 @@
 ---
 
 # 💻 Tech Stack:
-![C](https://img.shields.io/badge/C-A8B9CC?style=flat-square&logo=c&logoColor=white) 
+![C](https://img.shields.io/badge/C-A8B9CC?style=for-the-badge&logo=c&logoColor=white)
 ![C++](https://img.shields.io/badge/c++-%2300599C.svg?style=for-the-badge&logo=c%2B%2B&logoColor=white) 
 ![Java](https://img.shields.io/badge/java-%23ED8B00.svg?style=for-the-badge&logo=openjdk&logoColor=white) 
 ![Git](https://img.shields.io/badge/git-%23F05033.svg?style=for-the-badge&logo=git&logoColor=white)
