@@ -3,7 +3,7 @@
 ---
 
 ## 💫 About Me:
-💻 Working at MIP Technologies logo  MIP Technologies Ltd.
+💻 Working at MIP Technologies Ltd
 🛰️ Working on **Alba CubeSat** university project (starting **November 2025**)  
 🚀 Contributing to **space technology development**<br/>
 🎓 Attending bachelor's degree in **Computer Engineering**  
