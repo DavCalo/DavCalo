@@ -65,20 +65,7 @@
 
 ## 🐍 GitHub Contributions
 
-<picture>
-  <source 
-    media="(prefers-color-scheme: dark)" 
-    srcset="https://raw.githubusercontent.com/DavCalo/DavCalo/output/github-contribution-grid-snake-dark.svg"
-  />
-  <source 
-    media="(prefers-color-scheme: light)" 
-    srcset="https://raw.githubusercontent.com/DavCalo/DavCalo/output/github-contribution-grid-snake.svg"
-  />
-  <img 
-    alt="GitHub contribution snake animation" 
-    src="https://raw.githubusercontent.com/DavCalo/DavCalo/output/github-contribution-grid-snake.svg"
-  />
-</picture>
+<p align="center"> <picture> <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/DavCalo/DavCalo/output/satellite-contribution-trail-dark.svg" /> <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/DavCalo/DavCalo/output/satellite-contribution-trail.svg" /> <img src="https://raw.githubusercontent.com/DavCalo/DavCalo/output/satellite-contribution-trail.svg" alt="Davide Calò GitHub contribution animation" /> </picture> </p>
 
 ---
 
