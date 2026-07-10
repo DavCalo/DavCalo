@@ -1,0 +1,60 @@
+name: Generate contribution orbit
+
+on:
+  schedule:
+    - cron: "17 0 * * *"
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "scripts/generate_contribution_orbit.py"
+      - ".github/workflows/contribution-orbit.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: contribution-orbit
+  cancel-in-progress: true
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Check out profile repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Generate animated contribution orbit
+        run: python scripts/generate_contribution_orbit.py
+        env:
+          GITHUB_USER: ${{ github.repository_owner }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish SVG files to output branch
+        run: |
+          set -euo pipefail
+
+          mkdir -p /tmp/contribution-orbit
+          cp dist/contribution-orbit*.svg /tmp/contribution-orbit/
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git checkout --orphan contribution-orbit-output
+          git rm -rf . || true
+          cp /tmp/contribution-orbit/*.svg .
+          touch .nojekyll
+
+          git add .
+          git commit -m "chore: update contribution orbit"
+          git push --force origin HEAD:output
