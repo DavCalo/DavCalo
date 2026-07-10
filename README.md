@@ -70,7 +70,7 @@ University project focused on space technology development.
     srcset="https://raw.githubusercontent.com/DavCalo/DavCalo/output/github-contribution-grid-snake.svg"
   />
   <img 
-    alt="GitHub contribution grid snake animation" 
+    alt="GitHub contribution snake animation" 
     src="https://raw.githubusercontent.com/DavCalo/DavCalo/output/github-contribution-grid-snake.svg"
   />
 </picture>
