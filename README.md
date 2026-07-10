@@ -22,7 +22,7 @@
 
 ## 🧠 What I Do
 
-- 🤖 **[MIP Technologies Ltd.](https://www.miptechnologies.tech)** — *AI & Software Development*  
+- <img src="assets/mip-logo.png" height="18" alt="MIP Technologies logo" /> **[MIP Technologies Ltd.](https://www.miptechnologies.tech)** — *AI & Software Development*  
   Working in an AI-driven technology environment focused on intelligent software solutions, automation, and practical applications of artificial intelligence.
 
 - 🛰️ **Alba CubeSat** — *University Space Technology Project*  
