@@ -37,7 +37,7 @@ Right now, I am:
 - 🎓 studying **Computer Engineering**
 - 🤖 contributing to software development at **MIP Technologies Ltd.**
 - 🛰️ taking part in the **AlbaSat** university CubeSat project
-- ⚙️ improving my skills in **C, C++, Java**, and software design
+- ⚙️ improving my skills in **C, C++, Java, Python, SQL**, and software design
 - 🚀 exploring how intelligent software can work inside embedded and space systems
 
 > When I am not debugging, I am probably thinking about how software can leave Earth.
@@ -93,6 +93,27 @@ Contributing to a multidisciplinary project where software, embedded systems, el
 - writing cleaner and more maintainable code
 - connecting software engineering with physical systems
 - documenting what I learn along the way
+
+## 🛰️ Contribution orbit
+
+Each star represents a day on GitHub. Brighter signals mean more contributions, while the CubeSat follows a route generated from my weekly activity.
+
+<p align="center">
+  <picture>
+    <source
+      media="(prefers-color-scheme: dark)"
+      srcset="https://raw.githubusercontent.com/DavCalo/DavCalo/output/contribution-orbit-dark.svg"
+    />
+    <source
+      media="(prefers-color-scheme: light)"
+      srcset="https://raw.githubusercontent.com/DavCalo/DavCalo/output/contribution-orbit.svg"
+    />
+    <img
+      src="https://raw.githubusercontent.com/DavCalo/DavCalo/output/contribution-orbit.svg"
+      alt="Davide Calò animated GitHub contribution orbit"
+    />
+  </picture>
+</p>
 
 ## ✨ What you'll find here
 
