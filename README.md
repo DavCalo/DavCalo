@@ -1,72 +1,113 @@
-# 👋 Hi there, I'm Davide Calò
+<div align="center">
 
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-blue?style=flat-square&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/davide-cal%C3%B2-632255390)
-[![Website](https://img.shields.io/badge/Website-miptechnologies.tech-24292f?style=flat-square&logo=google-chrome&logoColor=white)](https://www.miptechnologies.tech)
-[![Email](https://img.shields.io/badge/Email-contact-d14836?style=flat-square&logo=gmail&logoColor=white)](mailto:calo.davide02@gmail.com)
+# Hi, I'm Davide Calò 👋
 
-<p align="center">
-  <img 
-    src="https://readme-typing-svg.demolab.com?font=Fira+Code&duration=3000&pause=900&center=true&vCenter=true&width=650&lines=Computer+Engineering+Student;AI+%26+Software+Development;Embedded+Systems+%26+Low-Level+Programming;CubeSat+%7C+Space+Technology;Building+software+for+real-world+systems"
-    alt="Typing SVG"
-  />
+### I build things that think — and sometimes fly. 🛰️
+
+Computer Engineering student exploring the space between  
+**AI**, **embedded software**, and **space technology**.
+
+<p>
+  <a href="https://www.linkedin.com/in/davide-cal%C3%B2-632255390">
+    <img src="https://img.shields.io/badge/LinkedIn-Davide_Calò-0A66C2?style=flat-square&logo=linkedin&logoColor=white" alt="LinkedIn" />
+  </a>
+  <a href="https://www.miptechnologies.tech">
+    <img src="https://img.shields.io/badge/Website-miptechnologies.tech-24292F?style=flat-square&logo=google-chrome&logoColor=white" alt="Website" />
+  </a>
+  <a href="mailto:calo.davide02@gmail.com">
+    <img src="https://img.shields.io/badge/Email-calo.davide02@gmail.com-D14836?style=flat-square&logo=gmail&logoColor=white" alt="Email" />
+  </a>
 </p>
 
----
+<img
+  src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=500&size=18&duration=2800&pause=900&color=0EA5E9&center=true&vCenter=true&width=650&lines=Turning+ideas+into+code;Learning+by+building;From+software+to+CubeSats"
+  alt="Typing animation"
+/>
 
-🎓 Bachelor's student in **Computer Engineering**  
-🤖 Working at **MIP Technologies Ltd.**, an AI-focused technology company  
-🛰️ Contributing to the **Alba CubeSat** university project  
-🚀 Interested in **AI**, **embedded systems**, **software engineering**, and **space technology**
-
----
-
-## 🧠 What I Do
-
-- <img src="assets/mip-logo.png" height="18" alt="MIP Technologies logo" /> **[MIP Technologies Ltd.](https://www.miptechnologies.tech)** — *AI & Software Development*  
-  Working in an AI-driven technology environment focused on intelligent software solutions, automation, and practical applications of artificial intelligence.
-
-- 🛰️ **Alba CubeSat** — *University Space Technology Project*  
-  Contributing to a CubeSat project where software engineering, embedded systems, and aerospace applications meet.
+</div>
 
 ---
 
-## 🎯 Current Focus
+## 🌌 A little about me
 
-- Building a solid foundation in **computer engineering**
-- Exploring **AI-oriented software development**
-- Improving my skills in **C, C++, Java**, and software design
-- Applying engineering concepts to **space systems** and real-world technical projects
+I enjoy turning ideas into software and learning what happens when code meets the real world.
+
+Right now, I am:
+
+- 🎓 studying **Computer Engineering**
+- 🤖 contributing to software development at **MIP Technologies Ltd.**
+- 🛰️ taking part in the **AlbaSat** university CubeSat project
+- ⚙️ improving my skills in **C, C++, Java**, and software design
+- 🚀 exploring how intelligent software can work inside embedded and space systems
+
+> When I am not debugging, I am probably thinking about how software can leave Earth.
+
+## 🚀 Where I'm building
+
+<table>
+<tr>
+<td width="50%" valign="top">
+
+### <img src="assets/mip-logo.png" height="20" alt="MIP Technologies logo" /> MIP Technologies
+
+**AI & Software Development**
+
+Learning and contributing in an AI-focused environment involving intelligent software, automation, and practical applications of artificial intelligence.
+
+<a href="https://www.miptechnologies.tech"><strong>Visit the website →</strong></a>
+
+</td>
+<td width="50%" valign="top">
+
+### <img src="assets/albasat-logo.jpeg" height="28" alt="AlbaSat logo" /> AlbaSat
+
+**University CubeSat Project**
+
+Contributing to a multidisciplinary project where software, embedded systems, electronics, and space technology come together.
+
+</td>
+</tr>
+</table>
+
+## 🧰 My toolbox
+
+<p>
+  <img src="https://img.shields.io/badge/C-A8B9CC?style=flat-square&logo=c&logoColor=white" alt="C" />
+  <img src="https://img.shields.io/badge/C++-00599C?style=flat-square&logo=c%2B%2B&logoColor=white" alt="C++" />
+  <img src="https://img.shields.io/badge/Java-ED8B00?style=flat-square&logo=openjdk&logoColor=white" alt="Java" />
+  <img src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python" />
+  <img src="https://img.shields.io/badge/SQL-336791?style=flat-square&logo=postgresql&logoColor=white" alt="SQL" />
+  <img src="https://img.shields.io/badge/Git-F05032?style=flat-square&logo=git&logoColor=white" alt="Git" />
+</p>
+
+## 🔭 Currently on my radar
+
+<p>
+  <img src="https://img.shields.io/badge/AI-powered_software-412991?style=flat-square&logo=openai&logoColor=white" alt="AI-powered software" />
+  <img src="https://img.shields.io/badge/Embedded_systems-0F766E?style=flat-square&logo=arduino&logoColor=white" alt="Embedded systems" />
+  <img src="https://img.shields.io/badge/Low--level_programming-334155?style=flat-square&logo=c&logoColor=white" alt="Low-level programming" />
+  <img src="https://img.shields.io/badge/CubeSat_technology-0284C7?style=flat-square&logo=satellite&logoColor=white" alt="CubeSat technology" />
+</p>
+
+- building small projects that teach me something real
+- writing cleaner and more maintainable code
+- connecting software engineering with physical systems
+- documenting what I learn along the way
+
+## ✨ What you'll find here
+
+A growing collection of university work, experiments, and personal projects involving software engineering, intelligent systems, and space-oriented technology.
+
+I am still learning — and that is exactly why I build in public.
 
 ---
 
-## 💻 Tech Stack
+<div align="center">
 
-[![C](https://img.shields.io/badge/C-A8B9CC?style=flat-square&logo=c&logoColor=white)]()
-[![C++](https://img.shields.io/badge/C++-00599C?style=flat-square&logo=c%2B%2B&logoColor=white)]()
-[![Java](https://img.shields.io/badge/Java-ED8B00?style=flat-square&logo=openjdk&logoColor=white)]()
-[![Git](https://img.shields.io/badge/Git-F05033?style=flat-square&logo=git&logoColor=white)]()
+### 📡 Let's connect
 
-<!-- Add only if you actually use them:
-[![Python](https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white)]()
-[![Linux](https://img.shields.io/badge/Linux-FCC624?style=flat-square&logo=linux&logoColor=black)]()
-[![Arduino](https://img.shields.io/badge/Arduino-00979D?style=flat-square&logo=arduino&logoColor=white)]()
--->
+I am always happy to meet curious people, exchange ideas, and collaborate on meaningful projects.
 
----
+**Build. Learn. Launch. Repeat. 🚀**
 
-## 💡 Interests
-
-- 🤖 Artificial Intelligence  
-- 🛰️ Aerospace and CubeSat systems  
-- ⚙️ Embedded systems and low-level programming  
-- 🧩 Building software for real-world engineering challenges
-
----
-
-## 🐍 GitHub Contributions
-
-<p align="center"> <picture> <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/DavCalo/DavCalo/output/satellite-contribution-trail-dark.svg" /> <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/DavCalo/DavCalo/output/satellite-contribution-trail.svg" /> <img src="https://raw.githubusercontent.com/DavCalo/DavCalo/output/satellite-contribution-trail.svg" alt="Davide Calò GitHub contribution animation" /> </picture> </p>
-
----
-
-📬 _Always open to learning, building, and collaborating on meaningful technology._
+</div>
