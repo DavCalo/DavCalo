@@ -21,6 +21,7 @@ jobs:
           outputs: |
             dist/satellite-contribution-trail.svg?palette=github-light&color_snake=#0EA5E9&color_dots=#EBEDF0,#CFFAFE,#67E8F9,#38BDF8,#0EA5E9
             dist/satellite-contribution-trail-dark.svg?palette=github-dark&color_snake=#38BDF8&color_dots=#0D1117,#1E293B,#155E75,#0891B2,#67E8F9
+        env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Push generated files to output branch
