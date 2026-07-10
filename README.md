@@ -47,13 +47,17 @@ University project focused on space technology development.
 
 ## 📊 GitHub Stats
 
-<p align="left">
-  <img src="https://github-readme-stats.vercel.app/api?username=DavCalo&theme=dark&hide_border=true&include_all_commits=true&count_private=true" height="165" />
-  <img src="https://github-readme-stats.vercel.app/api/top-langs/?username=DavCalo&theme=dark&hide_border=true&include_all_commits=true&count_private=true&layout=compact" height="165" />
-</p>
-
-<p align="left">
-  <img src="https://nirzak-streak-stats.vercel.app/?user=DavCalo&theme=dark&hide_border=true" height="165" />
+<p align="center">
+  <img 
+    height="160"
+    src="https://github-readme-stats.vercel.app/api?username=DavCalo&show_icons=true&theme=github_dark&hide_border=true"
+    alt="DavCalo GitHub stats"
+  />
+  <img 
+    height="160"
+    src="https://github-readme-stats.vercel.app/api/top-langs/?username=DavCalo&layout=compact&theme=github_dark&hide_border=true"
+    alt="DavCalo top languages"
+  />
 </p>
 
 ---
