@@ -5,15 +5,10 @@
 [![Email](https://img.shields.io/badge/Email-contact-d14836?style=flat-square&logo=gmail&logoColor=white)](mailto:calo.davide02@gmail.com)
 
 <p align="center">
-
   <img 
-
     src="https://readme-typing-svg.demolab.com?font=Fira+Code&duration=3000&pause=900&center=true&vCenter=true&width=650&lines=Computer+Engineering+Student;AI+%26+Software+Development;Embedded+Systems+%26+Low-Level+Programming;CubeSat+%7C+Space+Technology;Building+software+for+real-world+systems"
-
     alt="Typing SVG"
-
   />
-
 </p>
 
 ---
