@@ -94,23 +94,23 @@ Contributing to a multidisciplinary project where software, embedded systems, el
 - connecting software engineering with physical systems
 - documenting what I learn along the way
 
-## 🛰️ Contribution orbit
+## 🛰️ Contribution scan
 
-Each star represents a day on GitHub. Brighter signals mean more contributions, while the CubeSat follows a route generated from my weekly activity.
+One satellite pass scans a full year of GitHub activity from left to right. Each signal represents a day: its position shows the date and weekday, while its brightness shows the number of contributions.
 
 <p align="center">
   <picture>
     <source
       media="(prefers-color-scheme: dark)"
-      srcset="https://raw.githubusercontent.com/DavCalo/DavCalo/output/contribution-orbit-dark.svg"
+      srcset="https://raw.githubusercontent.com/DavCalo/DavCalo/output/contribution-scan-dark.svg"
     />
     <source
       media="(prefers-color-scheme: light)"
-      srcset="https://raw.githubusercontent.com/DavCalo/DavCalo/output/contribution-orbit.svg"
+      srcset="https://raw.githubusercontent.com/DavCalo/DavCalo/output/contribution-scan.svg"
     />
     <img
-      src="https://raw.githubusercontent.com/DavCalo/DavCalo/output/contribution-orbit.svg"
-      alt="Davide Calò animated GitHub contribution orbit"
+      src="https://raw.githubusercontent.com/DavCalo/DavCalo/output/contribution-scan.svg"
+      alt="Davide Calò animated GitHub contribution satellite scan"
     />
   </picture>
 </p>
