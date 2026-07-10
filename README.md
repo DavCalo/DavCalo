@@ -2,11 +2,6 @@
 
 # Hi, I'm Davide Calò 👋
 
-### I build things that think — and sometimes fly. 🛰️
-
-Computer Engineering student exploring the space between  
-**AI**, **embedded software**, and **space technology**.
-
 <p>
   <a href="https://www.linkedin.com/in/davide-cal%C3%B2-632255390">
     <img src="https://img.shields.io/badge/LinkedIn-Davide_Calò-0A66C2?style=flat-square&logo=linkedin&logoColor=white" alt="LinkedIn" />
@@ -19,14 +14,7 @@ Computer Engineering student exploring the space between
   </a>
 </p>
 
-<img
-  src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=500&size=18&duration=2800&pause=900&color=0EA5E9&center=true&vCenter=true&width=650&lines=Turning+ideas+into+code;Learning+by+building;From+software+to+CubeSats"
-  alt="Typing animation"
-/>
-
 </div>
-
----
 
 ## 🌌 A little about me
 
@@ -40,7 +28,12 @@ Right now, I am:
 - ⚙️ improving my skills in **C, C++, Java, Python, SQL**, and software design
 - 🚀 exploring how intelligent software can work inside embedded and space systems
 
-> When I am not debugging, I am probably thinking about how software can leave Earth.
+<div align="center">
+  <img
+    src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=500&size=18&duration=2800&pause=900&color=0EA5E9&center=true&vCenter=true&width=650&lines=Turning+ideas+into+code;Learning+by+building;From+software+to+CubeSats"
+    alt="Typing animation"
+  />
+</div>
 
 ## 🚀 Where I'm building
 
@@ -48,22 +41,42 @@ Right now, I am:
 <tr>
 <td width="50%" valign="top">
 
-### <img src="assets/mip-logo.png" height="20" alt="MIP Technologies logo" /> MIP Technologies
+<h3>
+  <img
+    src="assets/mip-logo.png"
+    height="28"
+    align="middle"
+    alt="MIP Technologies logo"
+  />
+  <a href="https://www.miptechnologies.tech">MIP Technologies</a>
+</h3>
 
-**AI & Software Development**
+<strong>AI &amp; Software Development</strong>
 
-Learning and contributing in an AI-focused environment involving intelligent software, automation, and practical applications of artificial intelligence.
-
-<a href="https://www.miptechnologies.tech"><strong>Visit the website →</strong></a>
+<p>
+  We build tailor-made AI systems for businesses — from fine-tuned LLMs
+  to smart API integrations and end-to-end software optimization.
+</p>
 
 </td>
 <td width="50%" valign="top">
 
-### <img src="assets/albasat-logo.jpeg" height="28" alt="AlbaSat logo" /> AlbaSat
+<h3>
+  <img
+    src="assets/albasat-logo.jpeg"
+    height="38"
+    align="middle"
+    alt="AlbaSat logo"
+  />
+  AlbaSat UniPD
+</h3>
 
-**University CubeSat Project**
+<strong>University CubeSat Project</strong>
 
-Contributing to a multidisciplinary project where software, embedded systems, electronics, and space technology come together.
+<p>
+  Contributing to a multidisciplinary project where software, embedded
+  systems, electronics, and space technology come together.
+</p>
 
 </td>
 </tr>
