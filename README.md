@@ -1,4 +1,7 @@
-# Hi, I'm Davide Calò 👋
+# 👋 Hi there, I'm Davide Calò
+
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-blue?style=flat-square&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/davide-cal%C3%B2-632255390)
+[![Email](https://img.shields.io/badge/Email-contact-d14836?style=flat-square&logo=gmail&logoColor=white)](mailto:calo.davide02@gmail.com)
 
 <p align="center">
   <img 
@@ -7,91 +10,62 @@
   />
 </p>
 
-Computer Engineering student passionate about **software development**, **artificial intelligence**, **embedded systems**, and **space technology**.
+---
 
-Currently working at **MIP Technologies Ltd**, an AI-focused company, and contributing to the **Alba CubeSat** university project, where I apply computer engineering skills to real-world aerospace challenges.
+🎓 Bachelor's student in **Computer Engineering**  
+🤖 Working at **MIP Technologies Ltd.**, an AI-focused technology company  
+🛰️ Contributing to the **Alba CubeSat** university project  
+🚀 Passionate about **software development**, **embedded systems**, and **space technology**
 
 ---
 
-## 🚀 About Me
+## 🧠 What I Do
 
-- 💻 Working at **MIP Technologies Ltd** since **February 2026**
-- 🤖 Interested in **AI-driven software**, practical machine learning applications, and intelligent systems
-- 🛰️ Contributing to **Alba CubeSat**, a university space technology project, since **November 2025**
-- 🎓 Pursuing a Bachelor's Degree in **Computer Engineering**
-- ⚙️ Focused on **software engineering**, **low-level programming**, **embedded systems**, and **space systems**
-- 🌱 Always learning and building projects to improve my technical skills
+- 🤖 **MIP Technologies Ltd.** — *AI & Software Development*  
+  Working in an AI-driven environment focused on intelligent software solutions, automation, and practical applications of artificial intelligence.
 
----
-
-## 🛠️ Tech Stack
-
-<p align="left">
-  <img src="https://img.shields.io/badge/C-A8B9CC?style=for-the-badge&logo=c&logoColor=white" />
-  <img src="https://img.shields.io/badge/C++-00599C?style=for-the-badge&logo=c%2B%2B&logoColor=white" />
-  <img src="https://img.shields.io/badge/Java-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white" />
-  <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white" />
-  <img src="https://img.shields.io/badge/Git-F05033?style=for-the-badge&logo=git&logoColor=white" />
-</p>
+- 🛰️ **Alba CubeSat** — *University Space Technology Project*  
+  Contributing to a CubeSat project where software engineering, embedded systems, and aerospace applications meet.
 
 ---
 
-## 📌 Featured Work
+## 💻 Tech Stack
 
-### 🤖 MIP Technologies Ltd
+[![C](https://img.shields.io/badge/C-A8B9CC?style=flat-square&logo=c&logoColor=white)]()
+[![C++](https://img.shields.io/badge/C++-00599C?style=flat-square&logo=c%2B%2B&logoColor=white)]()
+[![Java](https://img.shields.io/badge/Java-ED8B00?style=flat-square&logo=openjdk&logoColor=white)]()
+[![Git](https://img.shields.io/badge/Git-F05033?style=flat-square&logo=git&logoColor=white)]()
 
-Working in an AI-focused technology environment, with interest in practical applications of artificial intelligence, software development, and intelligent systems.
-
-**Focus:** AI-oriented software, engineering support, and real-world technology solutions
-
-### 🛰️ Alba CubeSat
-
-University project focused on space technology development.
-
-**Role/Focus:** Software development, engineering support, and technical contribution  
-**Areas:** CubeSat systems, embedded/software engineering, aerospace applications
+🧠 Focused on **AI-oriented software**, **low-level programming**, **embedded systems**, and **space technology**
 
 ---
 
-<!-- 
-## 📊 GitHub Stats
+## 💡 Interests
 
-Temporarily disabled because the external stats services are currently unstable.
-
-<p align="left">
-  <img src="https://github-readme-stats.vercel.app/api?username=DavCalo&show_icons=true&theme=github_dark&hide_border=true" height="165" />
-  <img src="https://github-readme-stats.vercel.app/api/top-langs/?username=DavCalo&theme=github_dark&hide_border=true&layout=compact" height="165" />
-</p>
--->
-
-## 🛰️ Contribution Orbit
-
-<p align="center">
-  <picture>
-    <source 
-      media="(prefers-color-scheme: dark)" 
-      srcset="https://raw.githubusercontent.com/DavCalo/DavCalo/output/github-contribution-grid-snake-dark.svg"
-    />
-    <source 
-      media="(prefers-color-scheme: light)" 
-      srcset="https://raw.githubusercontent.com/DavCalo/DavCalo/output/github-contribution-grid-snake.svg"
-    />
-    <img 
-      alt="GitHub contribution snake animation" 
-      src="https://raw.githubusercontent.com/DavCalo/DavCalo/output/github-contribution-grid-snake.svg"
-    />
-  </picture>
-</p>
+- 🤖 Artificial Intelligence  
+- 🛰️ Aerospace & CubeSat systems  
+- ⚙️ Embedded systems and low-level programming  
+- 🧩 Building software for real-world engineering challenges
 
 ---
 
-## 🌐 Connect with Me
+## 🐍 GitHub Contributions
 
-<p align="left">
-  <a href="https://www.linkedin.com/in/davide-cal%C3%B2-632255390">
-    <img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" />
-  </a>
-  <a href="mailto:calo.davide02@gmail.com">
-    <img src="https://img.shields.io/badge/Email-D14836?style=for-the-badge&logo=gmail&logoColor=white" />
-  </a>
-</p>
+<picture>
+  <source 
+    media="(prefers-color-scheme: dark)" 
+    srcset="https://raw.githubusercontent.com/DavCalo/DavCalo/output/github-contribution-grid-snake-dark.svg"
+  />
+  <source 
+    media="(prefers-color-scheme: light)" 
+    srcset="https://raw.githubusercontent.com/DavCalo/DavCalo/output/github-contribution-grid-snake.svg"
+  />
+  <img 
+    alt="GitHub contribution snake animation" 
+    src="https://raw.githubusercontent.com/DavCalo/DavCalo/output/github-contribution-grid-snake.svg"
+  />
+</picture>
+
+---
+
+📬 _Always open to learning, building, and collaborating on meaningful technology._
