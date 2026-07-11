@@ -21,10 +21,9 @@ import sys
 import urllib.error
 import urllib.request
 from dataclasses import dataclass
-from datetime import date, datetime, timedelta
+from datetime import date, timedelta
 from html import escape
 from pathlib import Path
-from typing import Sequence
 
 GRAPHQL_URL = "https://api.github.com/graphql"
 QUERY = r"""
@@ -46,14 +45,14 @@ query ContributionCalendar($login: String!) {
 }
 """
 
-WIDTH = 1000
-HEIGHT = 350
-GRID_X0 = 132.0
-GRID_X1 = 918.0
-GRID_Y0 = 132.0
-GRID_ROW_GAP = 19.0
-SATELLITE_Y = 91.0
-SCAN_DURATION = 15.0
+WIDTH = 720
+HEIGHT = 224
+GRID_X0 = 48.0
+GRID_X1 = 672.0
+GRID_Y0 = 84.0
+GRID_ROW_GAP = 15.0
+SATELLITE_Y = 45.0
+SCAN_DURATION = 26.0
 
 
 @dataclass(frozen=True)
@@ -70,44 +69,45 @@ class Calendar:
     demo: bool = False
 
 
+@dataclass(frozen=True)
+class Geometry:
+    week_count: int
+    x0: float = GRID_X0
+    x1: float = GRID_X1
+    y0: float = GRID_Y0
+    row_gap: float = GRID_ROW_GAP
+
+    @property
+    def scan_top(self) -> float:
+        return self.y0 - 11.0
+
+    @property
+    def scan_bottom(self) -> float:
+        return self.y0 + 6 * self.row_gap + 11.0
+
+
 PALETTES = {
     "light": {
-        "background": "#F8FAFC",
-        "panel": "#FFFFFF",
-        "panel_alt": "#F1F5F9",
-        "border": "#D9E4EE",
-        "text": "#0F172A",
-        "muted": "#64748B",
-        "grid": "#D5E0E9",
-        "zero": "#DCE6EE",
-        "levels": ["#BAE6FD", "#67E8F9", "#0EA5E9", "#2563EB"],
-        "orbit": "#0284C7",
-        "beam": "#38BDF8",
-        "accent": "#7C3AED",
-        "body": "#E2E8F0",
+        "zero": "#B8C4D1",
+        "levels": ["#5A8FA8", "#287FA5", "#176B91", "#4F46E5"],
+        "orbit": "#64748B",
+        "beam": "#176B91",
+        "body": "#FFFFFF",
         "body_edge": "#334155",
-        "solar": "#0891B2",
-        "solar_grid": "#CFFAFE",
-        "good": "#059669",
+        "solar": "#287FA5",
+        "solar_edge": "#D9F0F7",
+        "core": "#176B91",
     },
     "dark": {
-        "background": "#07111E",
-        "panel": "#0A1728",
-        "panel_alt": "#0D2035",
-        "border": "#1C3850",
-        "text": "#E6F3FF",
-        "muted": "#8FA6BC",
-        "grid": "#173047",
-        "zero": "#183047",
-        "levels": ["#164E63", "#0E7490", "#22D3EE", "#A5F3FC"],
-        "orbit": "#38BDF8",
-        "beam": "#22D3EE",
-        "accent": "#A78BFA",
-        "body": "#DDEAF4",
-        "body_edge": "#BAE6FD",
-        "solar": "#0E7490",
-        "solar_grid": "#A5F3FC",
-        "good": "#34D399",
+        "zero": "#3F4D61",
+        "levels": ["#3C7A91", "#2F9CC2", "#55A8C5", "#A5B4FC"],
+        "orbit": "#64748B",
+        "beam": "#55A8C5",
+        "body": "#E2E8F0",
+        "body_edge": "#94A3B8",
+        "solar": "#2F9CC2",
+        "solar_edge": "#BAE6FD",
+        "core": "#55A8C5",
     },
 }
 
@@ -153,14 +153,17 @@ def fetch_calendar(login: str, token: str) -> Calendar:
     return Calendar(total=int(raw["totalContributions"]), weeks=weeks)
 
 
-def demo_calendar() -> Calendar:
+def demo_calendar(reference_date: date | None = None) -> Calendar:
     rng = random.Random(20260710)
-    start = date.today() - timedelta(days=370)
+    end = reference_date or date.today()
+    start = end - timedelta(days=365)
+    start -= timedelta(days=(start.weekday() + 1) % 7)
+    day_count = (end - start).days + 1
     counts: list[int] = []
-    for index in range(371):
-        # Deterministic preview with quiet and active phases.
+    for index in range(day_count):
+        # Seeded counts are repeatable for a fixed reference date.
         phase = 0.13 + 0.07 * (1 + math.sin(index / 25.0))
-        burst = 0.12 if 145 < index < 230 else 0.0
+        burst = 0.12 if 0.39 * day_count < index < 0.62 * day_count else 0.0
         if rng.random() >= phase + burst:
             counts.append(0)
             continue
@@ -170,15 +173,12 @@ def demo_calendar() -> Calendar:
         counts.append(min(amount, 30))
 
     weeks: list[list[Day]] = []
-    for week_index in range(53):
-        week: list[Day] = []
-        for weekday in range(7):
-            idx = week_index * 7 + weekday
-            if idx >= len(counts):
-                break
-            current = start + timedelta(days=idx)
-            week.append(Day(current.isoformat(), weekday, counts[idx]))
-        weeks.append(week)
+    for index, count in enumerate(counts):
+        current = start + timedelta(days=index)
+        weekday = (current.weekday() + 1) % 7
+        if weekday == 0 or not weeks:
+            weeks.append([])
+        weeks[-1].append(Day(current.isoformat(), weekday, count))
     return Calendar(total=sum(counts), weeks=weeks, demo=True)
 
 
@@ -186,262 +186,135 @@ def flatten_days(calendar: Calendar) -> list[Day]:
     return [day for week in calendar.weeks for day in week]
 
 
-def longest_streak(days: Sequence[Day]) -> int:
-    best = current = 0
-    for item in sorted(days, key=lambda day: day.date):
-        if item.count > 0:
-            current += 1
-            best = max(best, current)
-        else:
-            current = 0
-    return best
-
-
 def level_for(count: int, max_count: int) -> int:
     if count <= 0 or max_count <= 0:
         return 0
+    # Log scaling keeps ordinary activity distinguishable when one day is extreme.
     ratio = math.log1p(count) / math.log1p(max_count)
     return min(4, max(1, math.ceil(ratio * 4)))
 
 
-def x_for_week(week_index: int, week_count: int) -> float:
-    if week_count <= 1:
-        return (GRID_X0 + GRID_X1) / 2
-    return GRID_X0 + week_index * ((GRID_X1 - GRID_X0) / (week_count - 1))
+def build_geometry(calendar: Calendar) -> Geometry:
+    return Geometry(week_count=max(1, len(calendar.weeks)))
 
 
-def y_for_weekday(weekday: int) -> float:
-    return GRID_Y0 + weekday * GRID_ROW_GAP
+def x_for_week(week_index: int, geometry: Geometry) -> float:
+    if geometry.week_count <= 1:
+        return (geometry.x0 + geometry.x1) / 2
+    return geometry.x0 + week_index * (
+        (geometry.x1 - geometry.x0) / (geometry.week_count - 1)
+    )
 
 
-def month_labels(calendar: Calendar) -> list[tuple[float, str]]:
-    labels: list[tuple[float, str]] = []
-    last_month: int | None = None
-    for week_index, week in enumerate(calendar.weeks):
-        if not week:
-            continue
-        first = datetime.fromisoformat(week[0].date)
-        if first.month != last_month:
-            labels.append((x_for_week(week_index, len(calendar.weeks)), first.strftime("%b").upper()))
-            last_month = first.month
-    return labels
+def y_for_weekday(weekday: int, geometry: Geometry) -> float:
+    if not 0 <= weekday <= 6:
+        raise ValueError(f"weekday must be between 0 and 6, got {weekday}")
+    return geometry.y0 + weekday * geometry.row_gap
 
 
-def scan_delay(week_index: int, week_count: int) -> float:
-    if week_count <= 1:
-        return 0.0
-    # Satellite is visible during the middle 90% of the cycle.
-    return 0.04 * SCAN_DURATION + (week_index / (week_count - 1)) * 0.88 * SCAN_DURATION
+def circle_subpath(x: float, y: float, radius: float) -> str:
+    return (
+        f"M{x - radius:.2f},{y:.2f}"
+        f"a{radius:.2f},{radius:.2f} 0 1,0 {2 * radius:.2f},0"
+        f"a{radius:.2f},{radius:.2f} 0 1,0 {-2 * radius:.2f},0Z"
+    )
 
 
-def render_signal(
-    x: float,
-    y: float,
-    day: Day,
-    level: int,
+def render_signal_paths(
+    calendar: Calendar,
+    geometry: Geometry,
     palette: dict[str, object],
-    delay: float,
 ) -> str:
-    if level == 0:
-        radius = 1.75
-        color = str(palette["zero"])
-        base_opacity = 0.82
-        glow = ""
-    else:
-        radius = [0.0, 2.35, 2.95, 3.65, 4.45][level]
-        color = str(palette["levels"][level - 1])  # type: ignore[index]
-        base_opacity = [0.0, 0.78, 0.84, 0.92, 1.0][level]
-        glow = ' filter="url(#signalGlow)"' if level >= 3 else ""
+    max_count = max((day.count for day in flatten_days(calendar)), default=0)
+    radii = [1.70, 2.30, 2.90, 3.55, 4.20]
+    opacities = [0.72, 0.78, 0.86, 0.94, 1.0]
+    paths: list[list[str]] = [[] for _ in range(5)]
 
-    pulse_radius = radius + (0.75 if level == 0 else 1.25)
-    label = "contribution" if day.count == 1 else "contributions"
-    return (
-        f'<circle cx="{x:.2f}" cy="{y:.2f}" r="{radius:.2f}" fill="{color}" '
-        f'opacity="{base_opacity:.2f}"{glow}>'
-        f'<animate attributeName="opacity" values="{base_opacity:.2f};1;{base_opacity:.2f};{base_opacity:.2f}" '
-        f'keyTimes="0;0.025;0.075;1" begin="{delay:.3f}s" dur="{SCAN_DURATION:.1f}s" repeatCount="indefinite"/>'
-        f'<animate attributeName="r" values="{radius:.2f};{pulse_radius:.2f};{radius:.2f};{radius:.2f}" '
-        f'keyTimes="0;0.025;0.075;1" begin="{delay:.3f}s" dur="{SCAN_DURATION:.1f}s" repeatCount="indefinite"/>'
-        f'<title>{escape(day.date)}: {day.count} {label}</title>'
-        f'</circle>'
-    )
+    for week_index, week in enumerate(calendar.weeks):
+        x = x_for_week(week_index, geometry)
+        for day in week:
+            level = level_for(day.count, max_count)
+            paths[level].append(
+                circle_subpath(x, y_for_weekday(day.weekday, geometry), radii[level])
+            )
 
-
-def render_week_scan(x: float, palette: dict[str, object], delay: float) -> str:
-    return (
-        f'<line x1="{x:.2f}" y1="{GRID_Y0 - 9:.2f}" x2="{x:.2f}" y2="{GRID_Y0 + 6 * GRID_ROW_GAP + 9:.2f}" '
-        f'stroke="{palette["beam"]}" stroke-width="1.2" opacity="0">'
-        f'<animate attributeName="opacity" values="0;0.34;0;0" keyTimes="0;0.025;0.075;1" '
-        f'begin="{delay:.3f}s" dur="{SCAN_DURATION:.1f}s" repeatCount="indefinite"/>'
-        f'</line>'
-    )
+    rendered: list[str] = []
+    for level, subpaths in enumerate(paths):
+        if not subpaths:
+            continue
+        color = palette["zero"] if level == 0 else palette["levels"][level - 1]  # type: ignore[index]
+        rendered.append(
+            f'<path data-level="{level}" d="{"".join(subpaths)}" '
+            f'fill="{color}" opacity="{opacities[level]:.2f}"/>'
+        )
+    return "\n    ".join(rendered)
 
 
 def render_satellite(palette: dict[str, object]) -> str:
-    travel_start = GRID_X0
-    travel_end = GRID_X1
-    return f'''
-    <g class="orbital-scanner" transform="translate(132.00 91.00)" opacity="1">
-      <animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0;0.035;0.925;0.965;1" dur="{SCAN_DURATION:.1f}s" repeatCount="indefinite"/>
-      <animateTransform attributeName="transform" type="translate"
-        values="{travel_start:.2f} {SATELLITE_Y:.2f};{travel_start:.2f} {SATELLITE_Y:.2f};{travel_end:.2f} {SATELLITE_Y:.2f};{travel_end:.2f} {SATELLITE_Y:.2f}"
-        keyTimes="0;0.04;0.92;1" dur="{SCAN_DURATION:.1f}s" repeatCount="indefinite" calcMode="linear"/>
+    return f'''<g transform="translate(0 {SATELLITE_Y:.2f}) scale(0.68)">
+        <path d="M-17 0H-10M10 0H17" fill="none" stroke="{palette['body_edge']}" stroke-width="1.8" stroke-linecap="round"/>
+        <rect x="-26" y="-6" width="9" height="12" rx="1.5" fill="{palette['solar']}" stroke="{palette['solar_edge']}" stroke-width="1"/>
+        <rect x="17" y="-6" width="9" height="12" rx="1.5" fill="{palette['solar']}" stroke="{palette['solar_edge']}" stroke-width="1"/>
+        <rect x="-10" y="-8" width="20" height="16" rx="4" fill="{palette['body']}" stroke="{palette['body_edge']}" stroke-width="1.4"/>
+        <circle cx="0" cy="0" r="2.5" fill="{palette['core']}"/>
+        <path d="M0-8V-14" fill="none" stroke="{palette['body_edge']}" stroke-width="1.3" stroke-linecap="round"/>
+        <circle cx="0" cy="-15" r="1.6" fill="{palette['core']}"/>
+      </g>'''
 
-      <g opacity="0.9">
-        <path d="M 0 13 L -26 {GRID_Y0 + 6 * GRID_ROW_GAP - SATELLITE_Y + 12:.2f} L 26 {GRID_Y0 + 6 * GRID_ROW_GAP - SATELLITE_Y + 12:.2f} Z"
-          fill="url(#scanBeam)"/>
-        <line x1="0" y1="14" x2="0" y2="{GRID_Y0 + 6 * GRID_ROW_GAP - SATELLITE_Y + 12:.2f}"
-          stroke="{palette['beam']}" stroke-width="1" stroke-dasharray="3 8" opacity="0.65">
-          <animate attributeName="stroke-dashoffset" from="0" to="-22" dur="1.1s" repeatCount="indefinite"/>
-        </line>
-      </g>
 
-      <g filter="url(#satGlow)" transform="scale(0.58)">
-        <path d="M -35 0 L -23 0 M 23 0 L 35 0" stroke="{palette['body_edge']}" stroke-width="2.4" stroke-linecap="round"/>
-        <rect x="-56" y="-10" width="21" height="20" rx="2.5" fill="{palette['solar']}" stroke="{palette['solar_grid']}" stroke-width="1.2"/>
-        <path d="M -49 -10 V 10 M -42 -10 V 10 M -56 0 H -35" stroke="{palette['solar_grid']}" stroke-width="0.8" opacity="0.72"/>
-        <rect x="35" y="-10" width="21" height="20" rx="2.5" fill="{palette['solar']}" stroke="{palette['solar_grid']}" stroke-width="1.2"/>
-        <path d="M 42 -10 V 10 M 49 -10 V 10 M 35 0 H 56" stroke="{palette['solar_grid']}" stroke-width="0.8" opacity="0.72"/>
-        <rect x="-23" y="-15" width="46" height="30" rx="7" fill="{palette['body']}" stroke="{palette['body_edge']}" stroke-width="1.7"/>
-        <rect x="-11" y="-7" width="22" height="14" rx="3" fill="{palette['panel_alt']}" stroke="{palette['orbit']}" stroke-width="1.3"/>
-        <circle cx="0" cy="0" r="3.8" fill="{palette['orbit']}">
-          <animate attributeName="opacity" values="0.4;1;0.4" dur="1.3s" repeatCount="indefinite"/>
-        </circle>
-        <path d="M 0 -15 V -27" stroke="{palette['body_edge']}" stroke-width="1.7" stroke-linecap="round"/>
-        <circle cx="0" cy="-28" r="2.4" fill="{palette['orbit']}"/>
-        <path d="M 5 -30 Q 13 -36 18 -28" fill="none" stroke="{palette['orbit']}" stroke-width="1.6" stroke-linecap="round">
-          <animate attributeName="opacity" values="0.15;0.95;0.15" dur="1.2s" repeatCount="indefinite"/>
-        </path>
-        <path d="M -28 0 H -45" stroke="{palette['orbit']}" stroke-width="2" stroke-linecap="round" opacity="0.7">
-          <animate attributeName="stroke-dasharray" values="2 12;8 6;2 12" dur="1.05s" repeatCount="indefinite"/>
-        </path>
-      </g>
-    </g>'''
+def calendar_period(calendar: Calendar) -> tuple[str, str]:
+    dates = sorted(day.date for day in flatten_days(calendar))
+    if not dates:
+        return "unknown", "unknown"
+    return dates[0], dates[-1]
 
 
 def render_svg(calendar: Calendar, login: str, theme: str) -> str:
+    if theme not in PALETTES:
+        raise ValueError(f"unknown theme: {theme}")
+
     palette = PALETTES[theme]
-    days = flatten_days(calendar)
-    max_count = max((day.count for day in days), default=0)
-    active_days = sum(day.count > 0 for day in days)
-    best_streak = longest_streak(days)
-    week_count = len(calendar.weeks)
+    geometry = build_geometry(calendar)
+    start_date, end_date = calendar_period(calendar)
+    signal_paths = render_signal_paths(calendar, geometry, palette)
+    travel_start = geometry.x0 - 12.0
+    travel_end = geometry.x1 + 12.0
+    reduced_x = geometry.x1 - 8.0
+    track_y = HEIGHT - 18.0
 
-    signals: list[str] = []
-    week_scans: list[str] = []
-    for week_index, week in enumerate(calendar.weeks):
-        x = x_for_week(week_index, week_count)
-        delay = scan_delay(week_index, week_count)
-        week_scans.append(render_week_scan(x, palette, delay))
-        for day in week:
-            y = y_for_weekday(day.weekday)
-            level = level_for(day.count, max_count)
-            signals.append(render_signal(x, y, day, level, palette, delay))
-
-    months = "".join(
-        f'<text x="{x:.2f}" y="115" fill="{palette["muted"]}" font-size="9.5" '
-        f'font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">{label}</text>'
-        for x, label in month_labels(calendar)
-        if x <= GRID_X1 - 15
-    )
-    suffix = "DEMO DATA" if calendar.demo else "LIVE GITHUB DATA"
-
-    return f'''<svg xmlns="http://www.w3.org/2000/svg" width="{WIDTH}" height="{HEIGHT}" viewBox="0 0 {WIDTH} {HEIGHT}" role="img" aria-labelledby="title desc">
-  <title id="title">{escape(login)} animated GitHub contribution satellite scan</title>
-  <desc id="desc">A CubeSat scans one year of GitHub contributions from left to right. Horizontal position represents time, vertical position represents weekday, and signal intensity represents contribution count.</desc>
-  <defs>
-    <linearGradient id="panelFill" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="{palette['panel']}"/>
-      <stop offset="1" stop-color="{palette['background']}"/>
-    </linearGradient>
-    <linearGradient id="scanBeam" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="{palette['beam']}" stop-opacity="0.30"/>
-      <stop offset="0.55" stop-color="{palette['beam']}" stop-opacity="0.08"/>
-      <stop offset="1" stop-color="{palette['beam']}" stop-opacity="0"/>
-    </linearGradient>
-    <linearGradient id="trackGradient" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="{palette['orbit']}" stop-opacity="0.18"/>
-      <stop offset="0.5" stop-color="{palette['orbit']}" stop-opacity="0.82"/>
-      <stop offset="1" stop-color="{palette['accent']}" stop-opacity="0.28"/>
-    </linearGradient>
-    <filter id="signalGlow" x="-180%" y="-180%" width="460%" height="460%">
-      <feGaussianBlur stdDeviation="2.0" result="blur"/>
-      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-    </filter>
-    <filter id="satGlow" x="-140%" y="-160%" width="380%" height="420%">
-      <feGaussianBlur stdDeviation="3.0" result="blur"/>
-      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-    </filter>
-    <clipPath id="panelClip"><rect x="1" y="1" width="998" height="348" rx="24"/></clipPath>
-  </defs>
-
-  <rect x="1" y="1" width="998" height="348" rx="24" fill="url(#panelFill)" stroke="{palette['border']}" stroke-width="2"/>
-
-  <g clip-path="url(#panelClip)">
-    <circle cx="930" cy="12" r="150" fill="{palette['orbit']}" opacity="0.035"/>
-    <circle cx="45" cy="350" r="145" fill="{palette['accent']}" opacity="0.035"/>
-
-    <g transform="translate(32 24)">
-      <rect width="12" height="12" rx="3" fill="{palette['orbit']}"/>
-      <circle cx="6" cy="6" r="2.1" fill="{palette['panel']}"/>
-      <text x="22" y="11" fill="{palette['text']}" font-size="16" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" letter-spacing="1.1">{escape(login.upper())} // CONTRIBUTION SCAN</text>
-      <text x="22" y="29" fill="{palette['muted']}" font-size="10.3" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" letter-spacing="0.95">{suffix} · 1 PASS = 1 YEAR · LEFT TO RIGHT</text>
+    return f'''<svg xmlns="http://www.w3.org/2000/svg" width="{WIDTH}" height="{HEIGHT}" viewBox="0 0 {WIDTH} {HEIGHT}" role="img" aria-labelledby="title desc" shape-rendering="geometricPrecision">
+  <title id="title">{escape(login)} Quiet Sweep contribution calendar, {escape(start_date)} to {escape(end_date)}</title>
+  <desc id="desc">GitHub contribution activity arranged chronologically with weeks from left to right and weekdays from top to bottom. Larger, more opaque, and more strongly colored circles indicate higher contribution activity; faint circles indicate days without contributions. A slow satellite scan is decorative, while all contribution signals remain static and continuously visible.</desc>
+  <style>
+    .quiet-sweep {{
+      transform: translateX({reduced_x:.2f}px);
+      opacity: 1;
+      animation: quiet-sweep {SCAN_DURATION:.1f}s linear infinite;
+    }}
+    @keyframes quiet-sweep {{
+      0%, 8% {{ transform: translateX({travel_start:.2f}px); opacity: 0; }}
+      10% {{ transform: translateX({travel_start:.2f}px); opacity: 1; }}
+      76% {{ transform: translateX({travel_end:.2f}px); opacity: 1; }}
+      82%, 100% {{ transform: translateX({travel_end:.2f}px); opacity: 0; }}
+    }}
+    @media (prefers-reduced-motion: reduce) {{
+      .quiet-sweep {{ animation: none; transform: translateX({reduced_x:.2f}px); opacity: 1; }}
+      .scan-line {{ display: none; }}
+    }}
+  </style>
+  <g aria-hidden="true">
+    <g>
+      {signal_paths}
     </g>
-
-    <g transform="translate(683 18)" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">
-      <rect x="0" y="0" width="92" height="44" rx="10" fill="{palette['panel_alt']}" stroke="{palette['border']}"/>
-      <text x="46" y="18" text-anchor="middle" fill="{palette['muted']}" font-size="8.4" letter-spacing="0.9">CONTRIBUTIONS</text>
-      <text x="46" y="35" text-anchor="middle" fill="{palette['text']}" font-size="15" font-weight="700">{calendar.total}</text>
-      <rect x="101" y="0" width="92" height="44" rx="10" fill="{palette['panel_alt']}" stroke="{palette['border']}"/>
-      <text x="147" y="18" text-anchor="middle" fill="{palette['muted']}" font-size="8.4" letter-spacing="0.9">ACTIVE DAYS</text>
-      <text x="147" y="35" text-anchor="middle" fill="{palette['text']}" font-size="15" font-weight="700">{active_days}</text>
-      <rect x="202" y="0" width="92" height="44" rx="10" fill="{palette['panel_alt']}" stroke="{palette['border']}"/>
-      <text x="248" y="18" text-anchor="middle" fill="{palette['muted']}" font-size="8.4" letter-spacing="0.9">BEST STREAK</text>
-      <text x="248" y="35" text-anchor="middle" fill="{palette['text']}" font-size="15" font-weight="700">{best_streak}d</text>
-    </g>
-
-    <path d="M {GRID_X0:.2f} {SATELLITE_Y:.2f} H {GRID_X1:.2f}" fill="none" stroke="url(#trackGradient)" stroke-width="1.4" stroke-linecap="round" stroke-dasharray="3 8" opacity="0.82">
-      <animate attributeName="stroke-dashoffset" from="0" to="-44" dur="2.6s" repeatCount="indefinite"/>
-    </path>
-    <circle cx="{GRID_X0:.2f}" cy="{SATELLITE_Y:.2f}" r="3" fill="{palette['orbit']}" opacity="0.7"/>
-    <circle cx="{GRID_X1:.2f}" cy="{SATELLITE_Y:.2f}" r="3" fill="{palette['accent']}" opacity="0.7"/>
-
-    {months}
-    <g fill="{palette['muted']}" font-size="9.5" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" text-anchor="end">
-      <text x="101" y="136">SUN</text>
-      <text x="101" y="174">TUE</text>
-      <text x="101" y="212">THU</text>
-      <text x="101" y="250">SAT</text>
-    </g>
-
-    <g opacity="0.52">
-      <line x1="{GRID_X0}" y1="{GRID_Y0}" x2="{GRID_X1}" y2="{GRID_Y0}" stroke="{palette['grid']}" stroke-width="0.7" stroke-dasharray="2 8"/>
-      <line x1="{GRID_X0}" y1="{GRID_Y0 + 2 * GRID_ROW_GAP}" x2="{GRID_X1}" y2="{GRID_Y0 + 2 * GRID_ROW_GAP}" stroke="{palette['grid']}" stroke-width="0.7" stroke-dasharray="2 8"/>
-      <line x1="{GRID_X0}" y1="{GRID_Y0 + 4 * GRID_ROW_GAP}" x2="{GRID_X1}" y2="{GRID_Y0 + 4 * GRID_ROW_GAP}" stroke="{palette['grid']}" stroke-width="0.7" stroke-dasharray="2 8"/>
-      <line x1="{GRID_X0}" y1="{GRID_Y0 + 6 * GRID_ROW_GAP}" x2="{GRID_X1}" y2="{GRID_Y0 + 6 * GRID_ROW_GAP}" stroke="{palette['grid']}" stroke-width="0.7" stroke-dasharray="2 8"/>
-    </g>
-
-    <g aria-label="Sequential weekly scan">{''.join(week_scans)}</g>
-    <g aria-label="Contribution signals">{''.join(signals)}</g>
-    {render_satellite(palette)}
-
-    <g transform="translate(34 318)" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="9.5" fill="{palette['muted']}">
-      <circle cx="4" cy="0" r="1.75" fill="{palette['zero']}"/>
-      <circle cx="23" cy="0" r="2.35" fill="{palette['levels'][0]}"/>
-      <circle cx="44" cy="0" r="2.95" fill="{palette['levels'][1]}"/>
-      <circle cx="67" cy="0" r="3.65" fill="{palette['levels'][2]}"/>
-      <circle cx="93" cy="0" r="4.45" fill="{palette['levels'][3]}" filter="url(#signalGlow)"/>
-      <text x="111" y="4">daily signal strength</text>
-    </g>
-
-    <g transform="translate(701 312)" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">
-      <circle cx="0" cy="4" r="3" fill="{palette['good']}">
-        <animate attributeName="opacity" values="0.45;1;0.45" dur="1.35s" repeatCount="indefinite"/>
-      </circle>
-      <text x="12" y="8" fill="{palette['muted']}" font-size="9.5" letter-spacing="1.0">SCANNER ONLINE · BUILD · LEARN · LAUNCH</text>
+    <path d="M{geometry.x0:.2f} {track_y:.2f}H{geometry.x1 - 7:.2f}" fill="none" stroke="{palette['orbit']}" stroke-width="1" stroke-linecap="round" opacity="0.42" vector-effect="non-scaling-stroke"/>
+    <path d="M{geometry.x1 - 7:.2f} {track_y - 4:.2f}L{geometry.x1:.2f} {track_y:.2f}L{geometry.x1 - 7:.2f} {track_y + 4:.2f}Z" fill="{palette['orbit']}" opacity="0.58"/>
+    <g class="quiet-sweep" transform="translate({reduced_x:.2f} 0)" opacity="1">
+      <line class="scan-line" x1="0" y1="{geometry.scan_top:.2f}" x2="0" y2="{geometry.scan_bottom:.2f}" stroke="{palette['beam']}" stroke-width="1.1" opacity="0.34" vector-effect="non-scaling-stroke"/>
+      {render_satellite(palette)}
     </g>
   </g>
-</svg>'''
+</svg>
+'''
 
 
 def parse_args() -> argparse.Namespace:
@@ -449,7 +322,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--user", default=os.getenv("GITHUB_USER", "DavCalo"))
     parser.add_argument("--token", default=os.getenv("GITHUB_TOKEN"))
     parser.add_argument("--output", type=Path, default=Path("dist"))
-    parser.add_argument("--demo", action="store_true", help="Generate deterministic preview data without GitHub")
+    parser.add_argument("--demo", action="store_true", help="Generate seeded preview data without GitHub")
     return parser.parse_args()
 
 

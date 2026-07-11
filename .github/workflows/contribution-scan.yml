@@ -22,39 +22,332 @@ jobs:
   generate:
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    env:
+      GENERATED_DIR: ${{ runner.temp }}/contribution-scan-generated
+      PUBLISH_DIR: ${{ runner.temp }}/contribution-scan-publish
+      PYTHONPYCACHEPREFIX: ${{ runner.temp }}/python-cache
 
     steps:
       - name: Check out profile repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
-          fetch-depth: 0
+          fetch-depth: 1
+          persist-credentials: true
 
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
         with:
           python-version: "3.13"
 
       - name: Generate animated contribution scan
-        run: python scripts/generate_contribution_scan.py
+        run: |
+          set -euo pipefail
+          mkdir -p "$GENERATED_DIR"
+          python3 scripts/generate_contribution_scan.py --output "$GENERATED_DIR"
+
+          if [[ -n "$(git status --porcelain --untracked-files=all)" ]]; then
+            echo "Generation modified the repository checkout" >&2
+            git status --short
+            exit 1
+          fi
         env:
           GITHUB_USER: ${{ github.repository_owner }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Publish SVG files to output branch
+      - name: Validate generated SVG files
         run: |
           set -euo pipefail
 
-          mkdir -p /tmp/contribution-scan
-          cp dist/contribution-scan*.svg /tmp/contribution-scan/
+          python3 - <<'PY'
+          from __future__ import annotations
 
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          import os
+          import re
+          import xml.etree.ElementTree as ET
+          from collections import Counter
+          from pathlib import Path
 
-          git checkout --orphan contribution-scan-output
-          git rm -rf . || true
-          cp /tmp/contribution-scan/*.svg .
-          touch .nojekyll
+          expected = {"contribution-scan.svg", "contribution-scan-dark.svg"}
+          output_dir = Path(os.environ["GENERATED_DIR"])
+          actual = {path.name for path in output_dir.iterdir()}
+          if actual != expected:
+              raise SystemExit(
+                  f"generated directory must contain exactly {sorted(expected)}, got {sorted(actual)}"
+              )
 
-          git add .
-          git commit -m "chore: update contribution scan"
-          git push --force origin HEAD:output
+          def local_name(name: str) -> str:
+              return name.rsplit("}", 1)[-1]
+
+          def class_tokens(element: ET.Element) -> set[str]:
+              return set(element.attrib.get("class", "").split())
+
+          def is_descendant(
+              element: ET.Element,
+              ancestor: ET.Element,
+              parents: dict[ET.Element, ET.Element],
+          ) -> bool:
+              current = parents.get(element)
+              while current is not None:
+                  if current is ancestor:
+                      return True
+                  current = parents.get(current)
+              return False
+
+          color_attributes = {"fill", "stroke", "color", "stop-color"}
+          css_color_property = re.compile(
+              r"(?i)(fill|stroke|color|stop-color)\s*:\s*([^;{}]+)"
+          )
+
+          def structural_signature(element: ET.Element) -> tuple[object, ...]:
+              tag = local_name(element.tag).lower()
+              attributes = tuple(
+                  sorted(
+                      (local_name(name).lower(), value)
+                      for name, value in element.attrib.items()
+                      if local_name(name).lower() not in color_attributes
+                  )
+              )
+              if tag in {"title", "desc"}:
+                  text = ""
+              elif tag == "style":
+                  text = css_color_property.sub(
+                      lambda match: f"{match.group(1).lower()}:<color>",
+                      element.text or "",
+                  )
+              else:
+                  text = (element.text or "").strip()
+              return (
+                  tag,
+                  attributes,
+                  text,
+                  tuple(structural_signature(child) for child in element),
+              )
+
+          validated_roots: dict[str, ET.Element] = {}
+
+          for filename in sorted(expected):
+              path = output_dir / filename
+              if not path.is_file() or path.stat().st_size == 0:
+                  raise SystemExit(f"{filename} is missing or empty")
+
+              raw = path.read_text(encoding="utf-8")
+              try:
+                  root = ET.fromstring(raw)
+              except ET.ParseError as exc:
+                  raise SystemExit(f"{filename} is not valid XML: {exc}") from exc
+
+              if local_name(root.tag).lower() != "svg":
+                  raise SystemExit(f"{filename} root element is not svg")
+
+              elements = list(root.iter())
+              parents = {
+                  child: parent
+                  for parent in elements
+                  for child in parent
+              }
+              names = Counter(local_name(element.tag).lower() for element in elements)
+              style_text = "\n".join(
+                  element.text or ""
+                  for element in elements
+                  if local_name(element.tag).lower() == "style"
+              )
+              visible_text = [
+                  element
+                  for element in elements
+                  if local_name(element.tag).lower() == "text"
+              ]
+
+              if names["title"] != 1 or names["desc"] != 1:
+                  raise SystemExit(f"{filename} must contain one title and one desc")
+              if root.attrib.get("role") != "img":
+                  raise SystemExit(f"{filename} must declare role=img")
+
+              labelled_ids = set(root.attrib.get("aria-labelledby", "").split())
+              accessible_ids = {
+                  element.attrib.get("id")
+                  for element in elements
+                  if local_name(element.tag).lower() in {"title", "desc"}
+              }
+              if None in accessible_ids or not accessible_ids <= labelled_ids:
+                  raise SystemExit(f"{filename} has an invalid aria-labelledby relationship")
+
+              if "prefers-reduced-motion: reduce" not in style_text:
+                  raise SystemExit(f"{filename} is missing reduced-motion handling")
+              if names["script"] or names["foreignobject"] or names["image"] or names["a"]:
+                  raise SystemExit(f"{filename} contains a forbidden SVG element")
+              if names["animate"] or names["animatetransform"] or names["animatemotion"] or names["set"]:
+                  raise SystemExit(f"{filename} contains SMIL animation")
+              if style_text.count("@keyframes") != 1:
+                  raise SystemExit(f"{filename} must contain exactly one CSS timeline")
+              if visible_text:
+                  raise SystemExit(f"{filename} contains visible text")
+              if any(local_name(element.tag).lower() == "rect" for element in list(root)):
+                  raise SystemExit(f"{filename} contains a root-level panel")
+
+              for element in elements:
+                  for attribute, value in element.attrib.items():
+                      attribute_name = local_name(attribute).lower()
+                      value_lower = value.lower()
+                      if attribute_name.startswith("on"):
+                          raise SystemExit(f"{filename} contains an event handler")
+                      if attribute_name.endswith("href") or attribute_name == "src":
+                          raise SystemExit(f"{filename} contains a linked resource")
+                      if any(token in value_lower for token in ("url(", "data:", "javascript:", "http://", "https://")):
+                          raise SystemExit(f"{filename} contains an external or embedded resource")
+
+              forbidden_words = {"LIVE", "ONLINE", "SCANNER", "STREAK", "TOTAL"}
+              matches = sorted(word for word in forbidden_words if word in raw.upper())
+              if matches:
+                  raise SystemExit(f"{filename} contains forbidden words: {matches}")
+
+              quiet_sweeps = [
+                  element
+                  for element in elements
+                  if local_name(element.tag).lower() == "g"
+                  and "quiet-sweep" in class_tokens(element)
+              ]
+              if len(quiet_sweeps) != 1:
+                  raise SystemExit(f"{filename} must contain exactly one quiet-sweep group")
+              quiet_sweep = quiet_sweeps[0]
+              if not quiet_sweep.attrib.get("transform", "").strip():
+                  raise SystemExit(f"{filename} quiet-sweep group is missing its SVG fallback transform")
+              try:
+                  base_opacity = float(quiet_sweep.attrib.get("opacity", ""))
+              except ValueError as exc:
+                  raise SystemExit(f"{filename} quiet-sweep group has invalid base opacity") from exc
+              if base_opacity <= 0:
+                  raise SystemExit(f"{filename} quiet-sweep group must be visible without CSS")
+
+              scan_lines = [
+                  element
+                  for element in elements
+                  if local_name(element.tag).lower() == "line"
+                  and "scan-line" in class_tokens(element)
+              ]
+              if len(scan_lines) != 1:
+                  raise SystemExit(f"{filename} must contain exactly one scan-line")
+              if not is_descendant(scan_lines[0], quiet_sweep, parents):
+                  raise SystemExit(f"{filename} scan-line must belong to the quiet-sweep group")
+
+              base_css = style_text.split("@keyframes", 1)[0]
+              base_rule = re.search(r"\.quiet-sweep\s*\{([^{}]*)\}", base_css, re.DOTALL)
+              if base_rule is None or not re.search(
+                  r"transform\s*:\s*translateX\([^)]*\)", base_rule.group(1)
+              ):
+                  raise SystemExit(f"{filename} CSS is missing the quiet-sweep base position")
+              if not re.search(r"opacity\s*:\s*(?:1(?:\.0*)?|0?\.[1-9]\d*)", base_rule.group(1)):
+                  raise SystemExit(f"{filename} CSS is missing visible quiet-sweep base opacity")
+
+              reduced_css = style_text.split("@media (prefers-reduced-motion: reduce)", 1)
+              if len(reduced_css) != 2:
+                  raise SystemExit(f"{filename} is missing the reduced-motion media rule")
+              reduced_body = reduced_css[1]
+              if not re.search(
+                  r"\.quiet-sweep\s*\{[^{}]*animation\s*:\s*none\s*;",
+                  reduced_body,
+                  re.DOTALL,
+              ):
+                  raise SystemExit(f"{filename} reduced motion does not disable the animation")
+              if not re.search(
+                  r"\.scan-line\s*\{[^{}]*display\s*:\s*none\s*;",
+                  reduced_body,
+                  re.DOTALL,
+              ):
+                  raise SystemExit(f"{filename} reduced motion does not hide the scan line")
+
+              signal_paths = [
+                  element
+                  for element in elements
+                  if local_name(element.tag).lower() == "path"
+                  and "data-level" in element.attrib
+              ]
+              if not 1 <= len(signal_paths) <= 5:
+                  raise SystemExit(f"{filename} must contain between one and five signal paths")
+              levels: set[int] = set()
+              for signal_path in signal_paths:
+                  try:
+                      level = int(signal_path.attrib["data-level"])
+                  except ValueError as exc:
+                      raise SystemExit(f"{filename} has a non-integer signal level") from exc
+                  if not 0 <= level <= 4 or level in levels:
+                      raise SystemExit(f"{filename} has an invalid or duplicate signal level {level}")
+                  if not signal_path.attrib.get("d", "").strip():
+                      raise SystemExit(f"{filename} has an empty signal path")
+                  if is_descendant(signal_path, quiet_sweep, parents):
+                      raise SystemExit(f"{filename} signal paths must remain outside quiet-sweep")
+                  levels.add(level)
+
+              validated_roots[filename] = root
+              print(f"Validated {filename} ({path.stat().st_size} bytes)")
+
+          light_signature = structural_signature(validated_roots["contribution-scan.svg"])
+          dark_signature = structural_signature(validated_roots["contribution-scan-dark.svg"])
+          if light_signature != dark_signature:
+              raise SystemExit("light and dark SVGs have different structure or geometry")
+          print("Validated matching light/dark structure and geometry")
+          PY
+
+      - name: Publish SVG files to output branch
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          set +e
+          git ls-remote --exit-code --refs origin refs/heads/output
+          remote_status=$?
+          set -e
+
+          case "$remote_status" in
+            0)
+              output_exists=true
+              git fetch --no-tags --depth=1 origin \
+                refs/heads/output:refs/remotes/origin/output
+              git worktree add --detach "$PUBLISH_DIR" origin/output
+              ;;
+            2)
+              output_exists=false
+              git worktree add --detach "$PUBLISH_DIR" HEAD
+              git -C "$PUBLISH_DIR" switch --orphan contribution-scan-output
+              ;;
+            *)
+              echo "Unable to verify the remote output branch (git ls-remote exit $remote_status)." >&2
+              exit "$remote_status"
+              ;;
+          esac
+
+          git -C "$PUBLISH_DIR" rm -rf --ignore-unmatch .
+          cp "$GENERATED_DIR/contribution-scan.svg" "$PUBLISH_DIR/contribution-scan.svg"
+          cp "$GENERATED_DIR/contribution-scan-dark.svg" "$PUBLISH_DIR/contribution-scan-dark.svg"
+          git -C "$PUBLISH_DIR" add -- contribution-scan.svg contribution-scan-dark.svg
+
+          python3 - <<'PY'
+          import os
+          import subprocess
+          from pathlib import Path
+
+          publish_dir = Path(os.environ["PUBLISH_DIR"])
+          tracked = set(
+              subprocess.run(
+                  ["git", "-C", str(publish_dir), "ls-files"],
+                  check=True,
+                  capture_output=True,
+                  text=True,
+              ).stdout.splitlines()
+          )
+          expected = {"contribution-scan.svg", "contribution-scan-dark.svg"}
+          if tracked != expected:
+              raise SystemExit(
+                  f"publish index must contain exactly {sorted(expected)}, got {sorted(tracked)}"
+              )
+          PY
+
+          if [[ "$output_exists" == "true" ]] && git -C "$PUBLISH_DIR" diff --cached --quiet; then
+            echo "Contribution scan output is unchanged; nothing to publish."
+            exit 0
+          fi
+
+          git -C "$PUBLISH_DIR" \
+            -c user.name="github-actions[bot]" \
+            -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+            commit -m "chore: update contribution scan"
+          git -C "$PUBLISH_DIR" push origin HEAD:output
