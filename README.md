@@ -80,7 +80,7 @@ I study Computer Engineering and build software where algorithms meet physical s
         <strong><a href="https://www.miptechnologies.tech">MIP Technologies</a></strong><br />
         <sub>AI &amp; Software Development</sub>
       </p>
-      <p>Building AI-powered software<br />and tailored digital solutions.</p>
+      <p>Building AI-powered software and digital solutions.</p>
     </td>
     <td width="50%" align="center" valign="top">
       <p>
@@ -94,7 +94,7 @@ I study Computer Engineering and build software where algorithms meet physical s
         <strong>AlbaSat UniPD</strong><br />
         <sub>University CubeSat Project</sub>
       </p>
-      <p>Developing embedded software<br />for a university CubeSat mission.</p>
+      <p>Building embedded software for a university CubeSat.</p>
     </td>
   </tr>
 </table>
