@@ -22,10 +22,6 @@ jobs:
   generate:
     runs-on: ubuntu-latest
     timeout-minutes: 5
-    env:
-      GENERATED_DIR: ${{ runner.temp }}/contribution-scan-generated
-      PUBLISH_DIR: ${{ runner.temp }}/contribution-scan-publish
-      PYTHONPYCACHEPREFIX: ${{ runner.temp }}/python-cache
 
     steps:
       - name: Check out profile repository
@@ -38,6 +34,16 @@ jobs:
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
         with:
           python-version: "3.13"
+
+      - name: Configure runner paths
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "GENERATED_DIR=$RUNNER_TEMP/contribution-scan-generated"
+            echo "PUBLISH_DIR=$RUNNER_TEMP/contribution-scan-publish"
+            echo "PYTHONPYCACHEPREFIX=$RUNNER_TEMP/python-cache"
+          } >> "$GITHUB_ENV"
 
       - name: Generate animated contribution scan
         run: |
