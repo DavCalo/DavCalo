@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Generate an animated GitHub contribution satellite scan as SVG.
+"""Generate an animated recent GitHub contribution telemetry scan as SVG.
 
 The horizontal axis is time (weeks), the vertical axis is weekday, and signal
-size/brightness represents contribution intensity. A CubeSat performs a single
-left-to-right scan over the year, fades out at the edge, and restarts invisibly
-from the left. There is no return trajectory and no data-driven vertical
-movement.
+size/brightness represents contribution intensity. The latest 26 weeks are
+expanded across the canvas. A CubeSat performs one left-to-right pass, briefly
+turning active days into larger circles or technical four-point signal flares.
+The complete contribution matrix remains static and continuously visible.
 
 Only Python's standard library is required.
 """
@@ -46,14 +46,20 @@ query ContributionCalendar($login: String!) {
 """
 
 WIDTH = 720
-HEIGHT = 252
+HEIGHT = 215
 GRID_X0 = 48.0
 GRID_X1 = 672.0
-GRID_Y0 = 84.0
+GRID_Y0 = 82.0
 GRID_ROW_GAP = 15.0
-SATELLITE_Y = 48.0
-SATELLITE_SCALE = 0.98
-SCAN_DURATION = 28.0
+RECENT_WEEK_LIMIT = 26
+SATELLITE_Y = 44.0
+SATELLITE_SCALE = 0.97
+SCAN_DURATION = 21.0
+TRAVEL_START = GRID_X0
+TRAVEL_END = GRID_X1
+FALLBACK_X = GRID_X1 - 4.0
+CLIP_TOP = 75.0
+CLIP_BOTTOM = 179.0
 
 
 @dataclass(frozen=True)
@@ -78,25 +84,16 @@ class Geometry:
     y0: float = GRID_Y0
     row_gap: float = GRID_ROW_GAP
 
-    @property
-    def scan_top(self) -> float:
-        return self.y0 - 16.0
-
-    @property
-    def scan_bottom(self) -> float:
-        return self.y0 + 6 * self.row_gap + 16.0
-
 
 PALETTES = {
     "light": {
         "zero": "#B8C4D1",
         "levels": ["#5A8FA8", "#287FA5", "#176B91", "#4F46E5"],
-        "orbit": "#64748B",
-        "orbit_soft": "#94A3B8",
-        "orbit_faint": "#CBD5E1",
-        "beam": "#176B91",
-        "scan_band": "#38A3C7",
-        "scan_edge": "#287FA5",
+        "flare": ["#4A91AC", "#269AC0", "#2F83B5", "#7277EE"],
+        "core_mid": "#D5F0F7",
+        "core_high": "#E0E7FF",
+        "marker": "#94A3B8",
+        "scan": "#287FA5",
         "body": "#F8FAFC",
         "body_edge": "#334155",
         "solar": "#287FA5",
@@ -108,12 +105,11 @@ PALETTES = {
     "dark": {
         "zero": "#3F4D61",
         "levels": ["#3C7A91", "#2F9CC2", "#55A8C5", "#A5B4FC"],
-        "orbit": "#64748B",
-        "orbit_soft": "#475569",
-        "orbit_faint": "#334155",
-        "beam": "#55A8C5",
-        "scan_band": "#55A8C5",
-        "scan_edge": "#A5B4FC",
+        "flare": ["#5AA5BA", "#61BED8", "#7DD3FC", "#C7D2FE"],
+        "core_mid": "#D9F2F8",
+        "core_high": "#E0E7FF",
+        "marker": "#64748B",
+        "scan": "#7DD3FC",
         "body": "#E2E8F0",
         "body_edge": "#94A3B8",
         "solar": "#2F9CC2",
@@ -195,6 +191,15 @@ def demo_calendar(reference_date: date | None = None) -> Calendar:
     return Calendar(total=sum(counts), weeks=weeks, demo=True)
 
 
+def recent_calendar(calendar: Calendar, week_limit: int = RECENT_WEEK_LIMIT) -> Calendar:
+    """Return a new calendar containing the latest chronological weeks."""
+    if week_limit <= 0:
+        raise ValueError("week_limit must be positive")
+    selected_weeks = [list(week) for week in calendar.weeks[-week_limit:]]
+    total = sum(day.count for week in selected_weeks for day in week)
+    return Calendar(total=total, weeks=selected_weeks, demo=calendar.demo)
+
+
 def flatten_days(calendar: Calendar) -> list[Day]:
     return [day for week in calendar.weeks for day in week]
 
@@ -233,80 +238,117 @@ def circle_subpath(x: float, y: float, radius: float) -> str:
     )
 
 
-def render_signal_paths(
+def star_subpath(x: float, y: float, outer_radius: float, inner_radius: float) -> str:
+    """Return a deterministic, symmetric four-point signal flare."""
+    points: list[tuple[float, float]] = []
+    for index in range(8):
+        angle = -math.pi / 2 + index * math.pi / 4
+        radius = outer_radius if index % 2 == 0 else inner_radius
+        points.append((x + math.cos(angle) * radius, y + math.sin(angle) * radius))
+    commands = [f"M{points[0][0]:.2f},{points[0][1]:.2f}"]
+    commands.extend(f"L{px:.2f},{py:.2f}" for px, py in points[1:])
+    commands.append("Z")
+    return "".join(commands)
+
+
+def build_signal_paths(
     calendar: Calendar,
     geometry: Geometry,
-    palette: dict[str, object],
-) -> str:
+) -> tuple[dict[int, str], dict[int, str], dict[str, str]]:
     max_count = max((day.count for day in flatten_days(calendar)), default=0)
-    radii = [1.70, 2.30, 2.90, 3.55, 4.20]
-    opacities = [0.72, 0.78, 0.86, 0.94, 1.0]
-    paths: list[list[str]] = [[] for _ in range(5)]
+    base_radii = [1.70, 2.30, 2.90, 3.55, 4.20]
+    flare_radii = {1: 2.70 * 1.06, 2: 3.70 * 1.08}
+    star_sizes = {3: (6.80 * 1.10, 2.45 * 1.10), 4: (8.00 * 1.10, 2.85 * 1.10)}
+
+    base_parts: dict[int, list[str]] = {level: [] for level in range(5)}
+    flare_parts: dict[int, list[str]] = {level: [] for level in range(1, 5)}
+    core_parts: dict[str, list[str]] = {"mid": [], "high": []}
 
     for week_index, week in enumerate(calendar.weeks):
         x = x_for_week(week_index, geometry)
         for day in week:
+            y = y_for_weekday(day.weekday, geometry)
             level = level_for(day.count, max_count)
-            paths[level].append(
-                circle_subpath(x, y_for_weekday(day.weekday, geometry), radii[level])
-            )
+            base_parts[level].append(circle_subpath(x, y, base_radii[level]))
 
+            if level in (1, 2):
+                flare_parts[level].append(circle_subpath(x, y, flare_radii[level]))
+            elif level in (3, 4):
+                outer, inner = star_sizes[level]
+                flare_parts[level].append(star_subpath(x, y, outer, inner))
+
+            if level in (2, 3):
+                core_parts["mid"].append(circle_subpath(x, y, 1.32))
+            elif level == 4:
+                core_parts["high"].append(circle_subpath(x, y, 1.87))
+                core_parts["high"].append(star_subpath(x, y, 3.30, 1.16))
+
+    base = {level: "".join(parts) for level, parts in base_parts.items() if parts}
+    flare = {level: "".join(parts) for level, parts in flare_parts.items() if parts}
+    cores = {name: "".join(parts) for name, parts in core_parts.items() if parts}
+    return base, flare, cores
+
+
+def render_base_paths(
+    paths: dict[int, str],
+    palette: dict[str, object],
+) -> str:
+    opacities = [0.72, 0.78, 0.86, 0.94, 1.00]
     rendered: list[str] = []
-    for level, subpaths in enumerate(paths):
-        if not subpaths:
-            continue
+    for level, data in paths.items():
         color = palette["zero"] if level == 0 else palette["levels"][level - 1]  # type: ignore[index]
         rendered.append(
-            f'<path data-level="{level}" d="{"".join(subpaths)}" '
-            f'fill="{color}" opacity="{opacities[level]:.2f}"/>'
+            f'<path data-level="{level}" d="{data}" fill="{color}" '
+            f'opacity="{opacities[level]:.2f}"/>'
         )
-    return "\n    ".join(rendered)
+    return " ".join(rendered)
+
+
+def render_flare_paths(
+    flare_paths: dict[int, str],
+    core_paths: dict[str, str],
+    palette: dict[str, object],
+) -> tuple[str, str]:
+    flare_opacities = [0.92, 0.97, 1.00, 1.00]
+    flare_rendered: list[str] = []
+    for level, data in flare_paths.items():
+        color = palette["flare"][level - 1]  # type: ignore[index]
+        flare_rendered.append(
+            f'<path data-flare-level="{level}" d="{data}" fill="{color}" '
+            f'opacity="{flare_opacities[level - 1]:.2f}"/>'
+        )
+
+    core_rendered: list[str] = []
+    if "mid" in core_paths:
+        core_rendered.append(
+            f'<path data-flare-core="mid" d="{core_paths["mid"]}" '
+            f'fill="{palette["core_mid"]}" opacity="0.98"/>'
+        )
+    if "high" in core_paths:
+        core_rendered.append(
+            f'<path data-flare-core="high" d="{core_paths["high"]}" '
+            f'fill="{palette["core_high"]}" opacity="1.00"/>'
+        )
+    return " ".join(flare_rendered), " ".join(core_rendered)
 
 
 def render_satellite(palette: dict[str, object]) -> str:
     return f'''<g class="satellite" transform="translate(0 {SATELLITE_Y:.2f}) scale({SATELLITE_SCALE:.2f})">
-        <path d="M-23 0H-15M15 0H23" fill="none" stroke="{palette['body_edge']}" stroke-width="2" stroke-linecap="round"/>
-        <rect x="-41" y="-10" width="18" height="20" rx="2" fill="{palette['solar']}" stroke="{palette['solar_edge']}" stroke-width="1.2"/>
-        <path d="M-35-10V10M-29-10V10M-41 0H-23" fill="none" stroke="{palette['solar_line']}" stroke-width="0.9" opacity="0.82"/>
-        <rect x="23" y="-10" width="18" height="20" rx="2" fill="{palette['solar']}" stroke="{palette['solar_edge']}" stroke-width="1.2"/>
-        <path d="M29-10V10M35-10V10M23 0H41" fill="none" stroke="{palette['solar_line']}" stroke-width="0.9" opacity="0.82"/>
-        <rect x="-15" y="-12" width="30" height="24" rx="5" fill="{palette['body']}" stroke="{palette['body_edge']}" stroke-width="1.6"/>
-        <path d="M-10-12L-6-17H6L10-12" fill="none" stroke="{palette['body_edge']}" stroke-width="1.4" stroke-linejoin="round"/>
-        <rect x="-12" y="-7" width="5" height="14" rx="1.5" fill="{palette['detail']}" opacity="0.34"/>
-        <rect x="7" y="-7" width="5" height="14" rx="1.5" fill="{palette['detail']}" opacity="0.34"/>
-        <circle cx="0" cy="0" r="5" fill="none" stroke="{palette['core']}" stroke-width="1.6"/>
-        <circle cx="0" cy="0" r="2.5" fill="{palette['core']}"/>
-        <path d="M0-17V-25M-7-28Q0-21 7-28" fill="none" stroke="{palette['body_edge']}" stroke-width="1.5" stroke-linecap="round"/>
-        <circle cx="0" cy="-26" r="1.8" fill="{palette['core']}"/>
-        <path d="M-7 8H7" fill="none" stroke="{palette['detail']}" stroke-width="1.2" stroke-linecap="round" opacity="0.72"/>
+        <path d="M-20 0H-13M13 0H20" fill="none" stroke="{palette['body_edge']}" stroke-width="1.8" stroke-linecap="round"/>
+        <rect x="-36" y="-9" width="16" height="18" rx="2" fill="{palette['solar']}" stroke="{palette['solar_edge']}" stroke-width="1.1"/>
+        <path d="M-30.7-9V9M-25.3-9V9M-36 0H-20" fill="none" stroke="{palette['solar_line']}" stroke-width="0.8" opacity="0.80"/>
+        <rect x="20" y="-9" width="16" height="18" rx="2" fill="{palette['solar']}" stroke="{palette['solar_edge']}" stroke-width="1.1"/>
+        <path d="M25.3-9V9M30.7-9V9M20 0H36" fill="none" stroke="{palette['solar_line']}" stroke-width="0.8" opacity="0.80"/>
+        <rect x="-13" y="-11" width="26" height="22" rx="4.5" fill="{palette['body']}" stroke="{palette['body_edge']}" stroke-width="1.5"/>
+        <path d="M-8-11L-5-15H5L8-11" fill="none" stroke="{palette['body_edge']}" stroke-width="1.3" stroke-linejoin="round"/>
+        <rect x="-10" y="-6" width="4" height="12" rx="1.2" fill="{palette['detail']}" opacity="0.30"/>
+        <rect x="6" y="-6" width="4" height="12" rx="1.2" fill="{palette['detail']}" opacity="0.30"/>
+        <circle cx="0" cy="0" r="4.8" fill="none" stroke="{palette['core']}" stroke-width="1.5"/>
+        <circle cx="0" cy="0" r="2.4" fill="{palette['core']}"/>
+        <path d="M0-15V-22M-6-25Q0-19 6-25" fill="none" stroke="{palette['body_edge']}" stroke-width="1.4" stroke-linecap="round"/>
+        <circle cx="0" cy="-23.2" r="1.6" fill="{palette['core']}"/>
+        <path d="M-6 7H6" fill="none" stroke="{palette['detail']}" stroke-width="1.1" stroke-linecap="round" opacity="0.68"/>
       </g>'''
-
-
-def render_orbital_frame(
-    geometry: Geometry,
-    palette: dict[str, object],
-) -> str:
-    timeline_y = HEIGHT - 34.0
-    return f'''<g class="orbital-frame" aria-hidden="true">
-      <path d="M18 184C130 12 590 4 704 100" fill="none" stroke="{palette['orbit']}" stroke-width="1.2" stroke-linecap="round" opacity="0.24"/>
-      <path d="M52 222C214 263 506 252 686 204" fill="none" stroke="{palette['orbit_soft']}" stroke-width="1" stroke-linecap="round" stroke-dasharray="3 10" opacity="0.30"/>
-      <circle cx="31" cy="175" r="3" fill="none" stroke="{palette['orbit']}" stroke-width="1.2" opacity="0.52"/>
-      <circle cx="690" cy="166" r="3" fill="{palette['orbit']}" opacity="0.46"/>
-      <path d="M30 68H72M648 68H690" fill="none" stroke="{palette['orbit_faint']}" stroke-width="1" stroke-linecap="round" opacity="0.48"/>
-      <path d="M{geometry.x0:.2f} {timeline_y:.2f}H{geometry.x1 - 11:.2f}M{geometry.x1 - 11:.2f} {timeline_y:.2f}L{geometry.x1 - 19:.2f} {timeline_y - 4:.2f}M{geometry.x1 - 11:.2f} {timeline_y:.2f}L{geometry.x1 - 19:.2f} {timeline_y + 4:.2f}" fill="none" stroke="{palette['orbit']}" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" opacity="0.46"/>
-    </g>'''
-
-
-def render_scan(
-    geometry: Geometry,
-    palette: dict[str, object],
-) -> str:
-    band_width = 18.0
-    band_x = -band_width / 2
-    band_height = geometry.scan_bottom - geometry.scan_top
-    return f'''<rect class="scan-band" x="{band_x:.2f}" y="{geometry.scan_top:.2f}" width="{band_width:.2f}" height="{band_height:.2f}" fill="{palette['scan_band']}" opacity="0.08"/>
-      <path class="scan-edge" d="M{band_x:.2f} {geometry.scan_top:.2f}V{geometry.scan_bottom:.2f}M{-band_x:.2f} {geometry.scan_top:.2f}V{geometry.scan_bottom:.2f}" fill="none" stroke="{palette['scan_edge']}" stroke-width="0.8" opacity="0.20"/>
-      <line class="scan-line" x1="0" y1="{geometry.scan_top:.2f}" x2="0" y2="{geometry.scan_bottom:.2f}" stroke="{palette['beam']}" stroke-width="1.4" opacity="0.58" vector-effect="non-scaling-stroke"/>'''
 
 
 def calendar_period(calendar: Calendar) -> tuple[str, str]:
@@ -320,47 +362,57 @@ def render_svg(calendar: Calendar, login: str, theme: str) -> str:
     if theme not in PALETTES:
         raise ValueError(f"unknown theme: {theme}")
 
+    display_calendar = recent_calendar(calendar)
     palette = PALETTES[theme]
-    geometry = build_geometry(calendar)
-    start_date, end_date = calendar_period(calendar)
-    signal_paths = render_signal_paths(calendar, geometry, palette)
-    travel_start = geometry.x0 - 20.0
-    travel_end = geometry.x1 + 20.0
-    reduced_x = geometry.x1 - 2.0
+    geometry = build_geometry(display_calendar)
+    start_date, end_date = calendar_period(display_calendar)
+    base_paths, flare_paths, core_paths = build_signal_paths(display_calendar, geometry)
+    base_markup = render_base_paths(base_paths, palette)
+    flare_markup, core_markup = render_flare_paths(flare_paths, core_paths, palette)
 
     return f'''<svg xmlns="http://www.w3.org/2000/svg" width="{WIDTH}" height="{HEIGHT}" viewBox="0 0 {WIDTH} {HEIGHT}" role="img" aria-labelledby="title desc" shape-rendering="geometricPrecision">
-  <title id="title">{escape(login)} Quiet Sweep Orbital Frame contribution calendar, {escape(start_date)} to {escape(end_date)}</title>
-  <desc id="desc">GitHub contribution activity arranged chronologically with weeks from left to right and weekdays from top to bottom. Larger, more opaque, and more strongly colored circles indicate higher contribution activity; faint circles indicate days without contributions. Open orbital arcs and a slow satellite sweep are decorative, while all contribution signals remain static and continuously visible.</desc>
+  <title id="title">{escape(login)} Signal Flare Strong, recent {len(display_calendar.weeks)}-week contribution calendar, {escape(start_date)} to {escape(end_date)}</title>
+  <desc id="desc">GitHub contribution activity from the latest {len(display_calendar.weeks)} weeks, {escape(start_date)} to {escape(end_date)}, arranged with weeks from left to right and weekdays from top to bottom. Larger and more strongly colored circles indicate higher contribution intensity. During the decorative satellite pass, active signals temporarily become larger circles or technical four-point flares with brighter centers, while the complete base calendar remains static and continuously visible.</desc>
   <style>
-    .quiet-sweep {{
-      transform: translateX({reduced_x:.2f}px);
-      opacity: 1;
-      animation: quiet-sweep {SCAN_DURATION:.1f}s linear infinite;
-    }}
-    @keyframes quiet-sweep {{
-      0%, 8% {{ transform: translateX({travel_start:.2f}px); opacity: 0; }}
-      11% {{ transform: translateX({travel_start:.2f}px); opacity: 1; }}
-      77% {{ transform: translateX({travel_end:.2f}px); opacity: 1; }}
-      83%, 100% {{ transform: translateX({travel_end:.2f}px); opacity: 0; }}
+    .quiet-sweep {{ transform: translateX({FALLBACK_X:.2f}px); opacity: 1; }}
+    .flare-motion {{ animation: signal-flare {SCAN_DURATION:.1f}s linear infinite; }}
+    .flare-layer, .scan-cues {{ opacity: 1; }}
+    @keyframes signal-flare {{
+      0%, 0.5% {{ transform: translateX({TRAVEL_START:.2f}px); opacity: 0; visibility: hidden; }}
+      2.5% {{ transform: translateX({TRAVEL_START:.2f}px); opacity: 1; visibility: visible; }}
+      72.5% {{ transform: translateX({TRAVEL_END:.2f}px); opacity: 1; visibility: visible; }}
+      77.5%, 100% {{ transform: translateX({TRAVEL_END:.2f}px); opacity: 0; visibility: hidden; }}
     }}
     @media (prefers-reduced-motion: reduce) {{
-      .quiet-sweep {{ animation: none; transform: translateX({reduced_x:.2f}px); opacity: 1; }}
-      .scan-line {{ display: none; }}
-      .scan-band, .scan-edge {{ display: none; }}
+      .quiet-sweep {{ animation: none; transform: translateX({FALLBACK_X:.2f}px); opacity: 1; }}
+      .clip-motion {{ animation: none; transform: translateX({FALLBACK_X:.2f}px); }}
+      .flare-layer, .scan-cues {{ display: none; }}
     }}
   </style>
+  <defs>
+    <clipPath id="sf-signal-flare-strong-main" clipPathUnits="userSpaceOnUse">
+      <rect class="flare-motion clip-motion" visibility="hidden" x="-14" y="{CLIP_TOP:.2f}" width="28" height="{CLIP_BOTTOM - CLIP_TOP:.2f}" transform="translate({FALLBACK_X:.2f} 0)"/>
+    </clipPath>
+    <clipPath id="sf-signal-flare-strong-core" clipPathUnits="userSpaceOnUse">
+      <rect class="flare-motion clip-motion" visibility="hidden" x="-5" y="{CLIP_TOP - 4:.2f}" width="10" height="{CLIP_BOTTOM - CLIP_TOP + 8:.2f}" transform="translate({FALLBACK_X:.2f} 0)"/>
+    </clipPath>
+  </defs>
   <g aria-hidden="true">
-    {render_orbital_frame(geometry, palette)}
-    <g class="signal-matrix">
-      {signal_paths}
+    <g class="terminal-markers" fill="none" stroke="{palette['marker']}" stroke-width="1" opacity="0.38">
+      <circle cx="{geometry.x0:.2f}" cy="61" r="2.4"/><circle cx="{geometry.x1:.2f}" cy="61" r="2.4"/>
     </g>
-    <g class="quiet-sweep" transform="translate({reduced_x:.2f} 0)" opacity="1">
-      {render_scan(geometry, palette)}
+    <g class="signal-matrix">{base_markup}</g>
+    <g class="flare-layer flare-main" clip-path="url(#sf-signal-flare-strong-main)" opacity="0">{flare_markup}</g>
+    <g class="flare-layer flare-cores" clip-path="url(#sf-signal-flare-strong-core)" opacity="0">{core_markup}</g>
+    <g class="quiet-sweep flare-motion" transform="translate({FALLBACK_X:.2f} 0)" opacity="1">
+      <g class="scan-cues" opacity="0">
+        <line class="scan-line" x1="0" y1="56" x2="0" y2="76" stroke="{palette['scan']}" stroke-width="1" opacity="0.44"/>
+        <path d="M-3.5 77H3.5M-3.5 181H3.5" fill="none" stroke="{palette['scan']}" stroke-width="1" stroke-linecap="round" opacity="0.48"/>
+      </g>
       {render_satellite(palette)}
     </g>
   </g>
-</svg>
-'''
+</svg>'''
 
 
 def parse_args() -> argparse.Namespace:
@@ -382,10 +434,18 @@ def main() -> int:
             return 2
         calendar = fetch_calendar(args.user, args.token)
 
+    display_calendar = recent_calendar(calendar)
     args.output.mkdir(parents=True, exist_ok=True)
-    (args.output / "contribution-scan.svg").write_text(render_svg(calendar, args.user, "light"), encoding="utf-8")
-    (args.output / "contribution-scan-dark.svg").write_text(render_svg(calendar, args.user, "dark"), encoding="utf-8")
-    print(f"Generated contribution scan for {args.user}: {calendar.total} contributions")
+    (args.output / "contribution-scan.svg").write_text(
+        render_svg(calendar, args.user, "light"), encoding="utf-8"
+    )
+    (args.output / "contribution-scan-dark.svg").write_text(
+        render_svg(calendar, args.user, "dark"), encoding="utf-8"
+    )
+    print(
+        f"Generated recent contribution scan for {args.user}: "
+        f"{display_calendar.total} contributions across {len(display_calendar.weeks)} weeks"
+    )
     return 0
 
 

@@ -99,10 +99,24 @@ jobs:
                   current = parents.get(current)
               return False
 
+          def has_ancestor_class(
+              element: ET.Element,
+              class_name: str,
+              parents: dict[ET.Element, ET.Element],
+          ) -> bool:
+              current = parents.get(element)
+              while current is not None:
+                  if class_name in class_tokens(current):
+                      return True
+                  current = parents.get(current)
+              return False
+
           color_attributes = {"fill", "stroke", "color", "stop-color"}
           css_color_property = re.compile(
               r"(?i)(fill|stroke|color|stop-color)\s*:\s*([^;{}]+)"
           )
+          local_clip_reference = re.compile(r"url\(#([A-Za-z_][A-Za-z0-9_.:-]*)\)")
+          forbidden_schemes = ("http:", "https:", "data:", "javascript:", "file:")
 
           def structural_signature(element: ET.Element) -> tuple[object, ...]:
               tag = local_name(element.tag).lower()
@@ -168,13 +182,24 @@ jobs:
               if root.attrib.get("role") != "img":
                   raise SystemExit(f"{filename} must declare role=img")
 
+              id_map: dict[str, ET.Element] = {}
+              for element in elements:
+                  if "id" not in element.attrib:
+                      continue
+                  identifier = element.attrib["id"].strip()
+                  if not identifier:
+                      raise SystemExit(f"{filename} contains an empty id")
+                  if identifier in id_map:
+                      raise SystemExit(f"{filename} contains duplicate id {identifier}")
+                  id_map[identifier] = element
+
               labelled_ids = set(root.attrib.get("aria-labelledby", "").split())
               accessible_ids = {
                   element.attrib.get("id")
                   for element in elements
                   if local_name(element.tag).lower() in {"title", "desc"}
               }
-              if None in accessible_ids or not accessible_ids <= labelled_ids:
+              if None in accessible_ids or labelled_ids != accessible_ids:
                   raise SystemExit(f"{filename} has an invalid aria-labelledby relationship")
 
               if "prefers-reduced-motion: reduce" not in style_text:
@@ -185,11 +210,16 @@ jobs:
                   raise SystemExit(f"{filename} contains SMIL animation")
               if style_text.count("@keyframes") != 1:
                   raise SystemExit(f"{filename} must contain exactly one CSS timeline")
+              if "visibility: hidden" not in style_text or "visibility: visible" not in style_text:
+                  raise SystemExit(f"{filename} timeline is missing clip visibility guards")
+              if "url(" in style_text.lower() or any(token in style_text.lower() for token in forbidden_schemes):
+                  raise SystemExit(f"{filename} contains a forbidden CSS resource reference")
               if visible_text:
                   raise SystemExit(f"{filename} contains visible text")
               if any(local_name(element.tag).lower() == "rect" for element in list(root)):
                   raise SystemExit(f"{filename} contains a root-level panel")
 
+              clip_references: list[tuple[ET.Element, str]] = []
               for element in elements:
                   for attribute, value in element.attrib.items():
                       attribute_name = local_name(attribute).lower()
@@ -198,13 +228,55 @@ jobs:
                           raise SystemExit(f"{filename} contains an event handler")
                       if attribute_name.endswith("href") or attribute_name == "src":
                           raise SystemExit(f"{filename} contains a linked resource")
-                      if any(token in value_lower for token in ("url(", "data:", "javascript:", "http://", "https://")):
+                      if any(token in value_lower for token in forbidden_schemes):
                           raise SystemExit(f"{filename} contains an external or embedded resource")
+                      if "url(" in value_lower:
+                          match = local_clip_reference.fullmatch(value)
+                          if attribute_name != "clip-path" or match is None:
+                              raise SystemExit(f"{filename} contains a forbidden url() reference")
+                          clip_references.append((element, match.group(1)))
+
+              for _, identifier in clip_references:
+                  target = id_map.get(identifier)
+                  if target is None:
+                      raise SystemExit(f"{filename} references missing clipPath id {identifier}")
+                  if local_name(target.tag).lower() != "clippath":
+                      raise SystemExit(f"{filename} reference {identifier} does not target clipPath")
+                  for descendant in target.iter():
+                      for attribute, value in descendant.attrib.items():
+                          attribute_name = local_name(attribute).lower()
+                          if attribute_name.startswith("on"):
+                              raise SystemExit(f"{filename} clipPath {identifier} contains an event handler")
+                          if attribute_name.endswith("href") or attribute_name == "src":
+                              raise SystemExit(f"{filename} clipPath {identifier} contains a linked resource")
+                          if "url(" in value.lower():
+                              raise SystemExit(f"{filename} clipPath {identifier} contains a nested reference")
+                      if local_name(descendant.tag).lower() in {"script", "image", "foreignobject"}:
+                          raise SystemExit(f"{filename} clipPath {identifier} contains a forbidden element")
 
               forbidden_words = {"LIVE", "ONLINE", "SCANNER", "STREAK", "TOTAL"}
               matches = sorted(word for word in forbidden_words if word in raw.upper())
               if matches:
                   raise SystemExit(f"{filename} contains forbidden words: {matches}")
+
+              clip_paths = [
+                  element for element in elements
+                  if local_name(element.tag).lower() == "clippath"
+              ]
+              if not 1 <= len(clip_paths) <= 2:
+                  raise SystemExit(f"{filename} must contain one or two clipPath elements")
+              for clip_path in clip_paths:
+                  children = list(clip_path)
+                  if len(children) != 1 or local_name(children[0].tag).lower() != "rect":
+                      raise SystemExit(f"{filename} clipPath must contain exactly one rect")
+                  clip_rect = children[0]
+                  classes = class_tokens(clip_rect)
+                  if not {"flare-motion", "clip-motion"} <= classes:
+                      raise SystemExit(f"{filename} clipPath rect is missing motion classes")
+                  if not clip_rect.attrib.get("transform", "").strip():
+                      raise SystemExit(f"{filename} clipPath rect is missing fallback transform")
+                  if clip_rect.attrib.get("visibility") != "hidden":
+                      raise SystemExit(f"{filename} clipPath rect must be hidden without animation")
 
               quiet_sweeps = [
                   element
@@ -235,6 +307,21 @@ jobs:
               if not is_descendant(scan_lines[0], quiet_sweep, parents):
                   raise SystemExit(f"{filename} scan-line must belong to the quiet-sweep group")
 
+              scan_cues = [
+                  element
+                  for element in elements
+                  if local_name(element.tag).lower() == "g"
+                  and "scan-cues" in class_tokens(element)
+              ]
+              if len(scan_cues) != 1 or not is_descendant(scan_cues[0], quiet_sweep, parents):
+                  raise SystemExit(f"{filename} must contain one scan-cues group inside quiet-sweep")
+              try:
+                  scan_cues_opacity = float(scan_cues[0].attrib.get("opacity", ""))
+              except ValueError as exc:
+                  raise SystemExit(f"{filename} scan-cues group has invalid fallback opacity") from exc
+              if scan_cues_opacity != 0:
+                  raise SystemExit(f"{filename} scan-cues must be hidden without CSS")
+
               base_css = style_text.split("@keyframes", 1)[0]
               base_rule = re.search(r"\.quiet-sweep\s*\{([^{}]*)\}", base_css, re.DOTALL)
               if base_rule is None or not re.search(
@@ -255,11 +342,17 @@ jobs:
               ):
                   raise SystemExit(f"{filename} reduced motion does not disable the animation")
               if not re.search(
-                  r"\.scan-line\s*\{[^{}]*display\s*:\s*none\s*;",
+                  r"\.clip-motion\s*\{[^{}]*animation\s*:\s*none\s*;",
                   reduced_body,
                   re.DOTALL,
               ):
-                  raise SystemExit(f"{filename} reduced motion does not hide the scan line")
+                  raise SystemExit(f"{filename} reduced motion does not stop the clip windows")
+              if not re.search(
+                  r"\.flare-layer\s*,\s*\.scan-cues\s*\{[^{}]*display\s*:\s*none\s*;",
+                  reduced_body,
+                  re.DOTALL,
+              ):
+                  raise SystemExit(f"{filename} reduced motion does not hide flare layers and scan cues")
 
               signal_paths = [
                   element
@@ -268,7 +361,7 @@ jobs:
                   and "data-level" in element.attrib
               ]
               if not 1 <= len(signal_paths) <= 5:
-                  raise SystemExit(f"{filename} must contain between one and five signal paths")
+                  raise SystemExit(f"{filename} must contain between one and five base signal paths")
               levels: set[int] = set()
               for signal_path in signal_paths:
                   try:
@@ -278,10 +371,75 @@ jobs:
                   if not 0 <= level <= 4 or level in levels:
                       raise SystemExit(f"{filename} has an invalid or duplicate signal level {level}")
                   if not signal_path.attrib.get("d", "").strip():
-                      raise SystemExit(f"{filename} has an empty signal path")
+                      raise SystemExit(f"{filename} has an empty base signal path")
                   if is_descendant(signal_path, quiet_sweep, parents):
-                      raise SystemExit(f"{filename} signal paths must remain outside quiet-sweep")
+                      raise SystemExit(f"{filename} base signal paths must remain outside quiet-sweep")
                   levels.add(level)
+
+              flare_layers = [
+                  element
+                  for element in elements
+                  if local_name(element.tag).lower() == "g"
+                  and "flare-layer" in class_tokens(element)
+              ]
+              if not 1 <= len(flare_layers) <= 2:
+                  raise SystemExit(f"{filename} must contain one or two flare-layer groups")
+              for flare_layer in flare_layers:
+                  try:
+                      fallback_opacity = float(flare_layer.attrib.get("opacity", ""))
+                  except ValueError as exc:
+                      raise SystemExit(f"{filename} flare-layer has invalid fallback opacity") from exc
+                  if fallback_opacity != 0:
+                      raise SystemExit(f"{filename} flare-layer must be hidden without CSS")
+                  if is_descendant(flare_layer, quiet_sweep, parents):
+                      raise SystemExit(f"{filename} flare-layer must remain outside quiet-sweep")
+                  if "clip-path" not in flare_layer.attrib:
+                      raise SystemExit(f"{filename} flare-layer is missing clip-path")
+
+              flare_paths = [
+                  element
+                  for element in elements
+                  if local_name(element.tag).lower() == "path"
+                  and "data-flare-level" in element.attrib
+              ]
+              if len(flare_paths) > 4:
+                  raise SystemExit(f"{filename} contains more than four flare paths")
+              flare_levels: set[int] = set()
+              for flare_path in flare_paths:
+                  try:
+                      level = int(flare_path.attrib["data-flare-level"])
+                  except ValueError as exc:
+                      raise SystemExit(f"{filename} has a non-integer flare level") from exc
+                  if not 1 <= level <= 4 or level in flare_levels:
+                      raise SystemExit(f"{filename} has an invalid or duplicate flare level {level}")
+                  if not flare_path.attrib.get("d", "").strip():
+                      raise SystemExit(f"{filename} has an empty flare path")
+                  if is_descendant(flare_path, quiet_sweep, parents):
+                      raise SystemExit(f"{filename} flare paths must remain outside quiet-sweep")
+                  if not has_ancestor_class(flare_path, "flare-layer", parents):
+                      raise SystemExit(f"{filename} flare path must belong to flare-layer")
+                  flare_levels.add(level)
+
+              core_paths = [
+                  element
+                  for element in elements
+                  if local_name(element.tag).lower() == "path"
+                  and "data-flare-core" in element.attrib
+              ]
+              if len(core_paths) > 2:
+                  raise SystemExit(f"{filename} contains more than two flare core paths")
+              core_names: set[str] = set()
+              for core_path in core_paths:
+                  name = core_path.attrib["data-flare-core"]
+                  if not name or name in core_names:
+                      raise SystemExit(f"{filename} has an empty or duplicate flare core name")
+                  if not core_path.attrib.get("d", "").strip():
+                      raise SystemExit(f"{filename} has an empty flare core path")
+                  if is_descendant(core_path, quiet_sweep, parents):
+                      raise SystemExit(f"{filename} flare core paths must remain outside quiet-sweep")
+                  if not has_ancestor_class(core_path, "flare-layer", parents):
+                      raise SystemExit(f"{filename} flare core must belong to flare-layer")
+                  core_names.add(name)
 
               validated_roots[filename] = root
               print(f"Validated {filename} ({path.stat().st_size} bytes)")
