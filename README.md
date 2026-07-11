@@ -59,54 +59,66 @@ I study Computer Engineering and build software across the boundary between algo
 
 <table width="100%">
   <tr>
-    <td width="22%" align="center" valign="middle">
-      <picture>
-        <source
-          media="(prefers-color-scheme: dark)"
-          srcset="assets/mip-logo-dark.png"
-        />
-        <source
-          media="(prefers-color-scheme: light)"
-          srcset="assets/mip-logo-light.png"
-        />
-        <img
-          src="assets/mip-logo-light.png"
-          height="52"
-          alt="MIP Technologies logo"
-        />
-      </picture>
-    </td>
-    <td width="78%" valign="middle">
+    <td width="50%" align="center" valign="top">
+      <p>
+        <picture>
+          <source
+            media="(prefers-color-scheme: dark)"
+            srcset="assets/mip-logo-dark.png"
+          />
+          <source
+            media="(prefers-color-scheme: light)"
+            srcset="assets/mip-logo-light.png"
+          />
+          <img
+            src="assets/mip-logo-light.png"
+            height="48"
+            alt="MIP Technologies logo"
+          />
+        </picture>
+      </p>
       <strong><a href="https://www.miptechnologies.tech">MIP Technologies</a></strong><br />
-      <sub>AI &amp; Software Development</sub><br /><br />
-      Building AI-powered software and tailored digital solutions.
+      <sub>AI &amp; Software Development</sub>
+      <p>AI-powered software and tailored digital solutions.</p>
     </td>
-  </tr>
-  <tr>
-    <td width="22%" align="center" valign="middle">
-      <img
-        src="assets/albasat-logo.png"
-        height="58"
-        alt="AlbaSat UniPD logo"
-      />
-    </td>
-    <td width="78%" valign="middle">
+    <td width="50%" align="center" valign="top">
+      <p>
+        <img
+          src="assets/albasat-logo.png"
+          height="56"
+          alt="AlbaSat UniPD logo"
+        />
+      </p>
       <strong>AlbaSat UniPD</strong><br />
-      <sub>University CubeSat Project</sub><br /><br />
-      Developing software and embedded systems for a university CubeSat mission.
+      <sub>University CubeSat Project</sub>
+      <p>Software and embedded systems for a university CubeSat mission.</p>
     </td>
   </tr>
 </table>
 
-## Engineering focus
+## Engineering systems map
 
-**Intelligent software** — AI-powered applications, machine vision, and automation workflows.
+<p align="center">
+  <picture>
+    <source
+      media="(prefers-color-scheme: dark)"
+      srcset="assets/engineering-systems-dark.svg"
+    />
+    <source
+      media="(prefers-color-scheme: light)"
+      srcset="assets/engineering-systems-light.svg"
+    />
+    <img
+      src="assets/engineering-systems-light.svg"
+      width="100%"
+      alt="Systems map connecting intelligent software, industrial systems, embedded engineering, and space systems"
+    />
+  </picture>
+</p>
 
-**Industrial systems** — 6-axis robot programming, integration, and software for production environments.
-
-**Embedded engineering** — Low-level software, communication interfaces, and hardware-aware design.
-
-**Space systems** — CubeSat software, telemetry, and multidisciplinary engineering.
+<p align="center">
+  <sub>Software as the connective layer across AI, 6-axis robotics, embedded engineering, and CubeSat systems</sub>
+</p>
 
 ## Engineering toolkit
 

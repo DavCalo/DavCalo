@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="320" viewBox="0 0 720 320" role="img" aria-labelledby="title desc" shape-rendering="geometricPrecision">
+  <title id="title">Engineering systems map</title>
+  <desc id="desc">A systems map connecting intelligent software, industrial systems, embedded engineering, and space systems through a central software layer.</desc>
+  <g aria-hidden="true">
+    <g fill="none" stroke="#334155" stroke-width="2" stroke-linecap="round">
+      <path d="M294 118C316 126 326 136 334 146"/>
+      <path d="M426 118C404 126 394 136 386 146"/>
+      <path d="M294 242C316 234 326 224 334 214"/>
+      <path d="M426 242C404 234 394 224 386 214"/>
+    </g>
+    <g fill="#94A3B8">
+      <circle cx="294" cy="118" r="3"/><circle cx="426" cy="118" r="3"/>
+      <circle cx="294" cy="242" r="3"/><circle cx="426" cy="242" r="3"/>
+    </g>
+
+    <g>
+      <rect x="30" y="34" width="264" height="96" rx="16" fill="#0B1220" stroke="#334155" stroke-width="1.5"/>
+      <g transform="translate(58 58)" fill="none" stroke="#7DD3FC" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M8 24L22 10L38 22L52 8M22 10L24 38M38 22L24 38L48 40"/>
+        <circle cx="8" cy="24" r="4" fill="#0B1220"/><circle cx="22" cy="10" r="4" fill="#0B1220"/>
+        <circle cx="38" cy="22" r="4" fill="#0B1220"/><circle cx="52" cy="8" r="4" fill="#0B1220"/>
+        <circle cx="24" cy="38" r="4" fill="#0B1220"/><circle cx="48" cy="40" r="4" fill="#0B1220"/>
+      </g>
+      <text x="132" y="75" fill="#E2E8F0" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="700">INTELLIGENT</text>
+      <text x="132" y="101" fill="#E2E8F0" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="700">SOFTWARE</text>
+    </g>
+
+    <g>
+      <rect x="426" y="34" width="264" height="96" rx="16" fill="#0B1220" stroke="#334155" stroke-width="1.5"/>
+      <g transform="translate(454 56)" fill="none" stroke="#7DD3FC" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 42H56M12 42V34H28V42M20 34V20L34 10L46 18M34 10V4M46 18V28L54 34"/>
+        <circle cx="20" cy="20" r="4" fill="#0B1220"/><circle cx="46" cy="18" r="4" fill="#0B1220"/>
+      </g>
+      <text x="528" y="75" fill="#E2E8F0" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="700">INDUSTRIAL</text>
+      <text x="528" y="101" fill="#E2E8F0" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="700">SYSTEMS</text>
+    </g>
+
+    <g>
+      <rect x="30" y="190" width="264" height="96" rx="16" fill="#0B1220" stroke="#334155" stroke-width="1.5"/>
+      <g transform="translate(58 213)" fill="none" stroke="#7DD3FC" stroke-width="2.1" stroke-linecap="round">
+        <rect x="12" y="8" width="38" height="38" rx="7"/>
+        <rect x="22" y="18" width="18" height="18" rx="3"/>
+        <path d="M6 16H12M6 27H12M6 38H12M50 16H56M50 27H56M50 38H56M20 2V8M31 2V8M42 2V8M20 46V52M31 46V52M42 46V52"/>
+      </g>
+      <text x="132" y="231" fill="#E2E8F0" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="700">EMBEDDED</text>
+      <text x="132" y="257" fill="#E2E8F0" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="700">ENGINEERING</text>
+    </g>
+
+    <g>
+      <rect x="426" y="190" width="264" height="96" rx="16" fill="#0B1220" stroke="#334155" stroke-width="1.5"/>
+      <g transform="translate(454 213)" fill="none" stroke="#7DD3FC" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M8 27H16M46 27H54"/>
+        <rect x="2" y="17" width="14" height="20" rx="2" fill="#38BDF8" opacity="0.18"/>
+        <rect x="46" y="17" width="14" height="20" rx="2" fill="#38BDF8" opacity="0.18"/>
+        <rect x="16" y="13" width="30" height="28" rx="5"/>
+        <circle cx="31" cy="27" r="5"/>
+        <path d="M31 13V6M27 4Q31 1 35 4"/>
+        <path d="M6 17V37M11 17V37M51 17V37M56 17V37" opacity="0.8"/>
+      </g>
+      <text x="528" y="231" fill="#E2E8F0" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="700">SPACE</text>
+      <text x="528" y="257" fill="#E2E8F0" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="700">SYSTEMS</text>
+    </g>
+
+    <g>
+      <path d="M360 116L412 146V206L360 236L308 206V146Z" fill="#111827" stroke="#3B82F6" stroke-width="2"/>
+      <path d="M341 154L331 164L341 174M379 154L389 164L379 174M368 145L352 183" fill="none" stroke="#38BDF8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="360" y="207" text-anchor="middle" fill="#A5B4FC" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="700" letter-spacing="1.1">SOFTWARE</text>
+    </g>
+  </g>
+</svg>
