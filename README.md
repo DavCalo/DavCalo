@@ -13,7 +13,7 @@
   </a>
   <a href="mailto:calo.davide02@gmail.com">
     <img
-      src="https://img.shields.io/badge/Email-334155?style=flat-square&logo=gmail&logoColor=white"
+      src="https://img.shields.io/badge/Email-D14836?style=flat-square&logo=gmail&logoColor=white"
       alt="Email"
     />
   </a>
@@ -56,7 +56,7 @@ I study Computer Engineering and build software where algorithms meet physical s
 
 ## Current missions
 
-<table width="100%">
+<table width="100%" align="center">
   <tr>
     <td width="50%" align="center" valign="top">
       <p>
@@ -105,23 +105,23 @@ I study Computer Engineering and build software where algorithms meet physical s
   <strong>Languages</strong><br />
   <img src="https://img.shields.io/badge/C-475569?style=flat-square&logo=c&logoColor=white" alt="C" />
   <img src="https://img.shields.io/badge/C++-00599C?style=flat-square&logo=c%2B%2B&logoColor=white" alt="C++" />
-  <img src="https://img.shields.io/badge/Java-007396?style=flat-square&logo=openjdk&logoColor=white" alt="Java" />
+  <img src="https://img.shields.io/badge/Java-ED8B00?style=flat-square&logo=openjdk&logoColor=white" alt="Java" />
   <img src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=FFD43B" alt="Python" />
-  <img src="https://img.shields.io/badge/SQL-334155?style=flat-square&logo=postgresql&logoColor=white" alt="SQL" />
+  <img src="https://img.shields.io/badge/SQL-336791?style=flat-square&logo=postgresql&logoColor=white" alt="SQL" />
 </p>
 
 <p>
   <strong>Industrial robotics</strong><br />
-  <img src="https://img.shields.io/badge/KUKA-KRL-C2410C?style=flat-square" alt="KUKA · KRL" />
-  <img src="https://img.shields.io/badge/Comau-PDL2-B91C1C?style=flat-square" alt="Comau · PDL2" />
-  <img src="https://img.shields.io/badge/Epson-SPEL%2B-1E3A8A?style=flat-square" alt="Epson · SPEL+" />
+  <img src="https://img.shields.io/badge/KUKA-KRL-F57C00?style=flat-square" alt="KUKA · KRL" />
+  <img src="https://img.shields.io/badge/Comau-PDL2-D71920?style=flat-square" alt="Comau · PDL2" />
+  <img src="https://img.shields.io/badge/Epson-SPEL%2B-003399?style=flat-square" alt="Epson · SPEL+" />
 </p>
 
 <p>
   <strong>Tools &amp; platforms</strong><br />
-  <img src="https://img.shields.io/badge/Git-C2410C?style=flat-square&logo=git&logoColor=white" alt="Git" />
+  <img src="https://img.shields.io/badge/Git-F05032?style=flat-square&logo=git&logoColor=white" alt="Git" />
   <img src="https://img.shields.io/badge/GitHub_Actions-2088FF?style=flat-square&logo=githubactions&logoColor=white" alt="GitHub Actions" />
-  <img src="https://img.shields.io/badge/Terraform-5C4EE5?style=flat-square&logo=terraform&logoColor=white" alt="Terraform" />
+  <img src="https://img.shields.io/badge/Terraform-844FBA?style=flat-square&logo=terraform&logoColor=white" alt="Terraform" />
 </p>
 
 <p>
