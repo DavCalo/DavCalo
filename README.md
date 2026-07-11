@@ -94,7 +94,7 @@ I study Computer Engineering and build software where algorithms meet physical s
         <strong>AlbaSat UniPD</strong><br />
         <sub>University CubeSat Project</sub>
       </p>
-      <p>Developing software and embedded systems<br />for a university CubeSat mission.</p>
+      <p>Developing embedded software<br />for a university CubeSat mission.</p>
     </td>
   </tr>
 </table>
