@@ -71,7 +71,7 @@ I study Computer Engineering and build software where algorithms meet physical s
           />
           <img
             src="assets/mip-logo-light.png"
-            height="48"
+            height="64"
             alt="MIP Technologies logo"
           />
         </picture>
@@ -80,7 +80,7 @@ I study Computer Engineering and build software where algorithms meet physical s
         <strong><a href="https://www.miptechnologies.tech">MIP Technologies</a></strong><br />
         <sub>AI &amp; Software Development</sub>
       </p>
-      <p>Building AI-powered software and tailored digital solutions.</p>
+      <p>Building AI-powered software<br />and tailored digital solutions.</p>
     </td>
     <td width="50%" align="center" valign="top">
       <p>
@@ -94,7 +94,7 @@ I study Computer Engineering and build software where algorithms meet physical s
         <strong>AlbaSat UniPD</strong><br />
         <sub>University CubeSat Project</sub>
       </p>
-      <p>Developing software and embedded systems for a university CubeSat mission.</p>
+      <p>Developing software and embedded systems<br />for a university CubeSat mission.</p>
     </td>
   </tr>
 </table>
