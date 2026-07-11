@@ -3,13 +3,13 @@
   <desc id="desc">GitHub contribution activity from the latest 26 weeks, 2026-01-11 to 2026-07-11, arranged with weeks from left to right and weekdays from top to bottom. Larger and more strongly colored circles indicate higher contribution intensity. During the decorative satellite pass, active signals temporarily become larger circles or technical four-point flares with brighter centers, while the complete base calendar remains static and continuously visible.</desc>
   <style>
     .quiet-sweep { transform: translateX(668.00px); opacity: 1; }
-    .flare-motion { animation: signal-flare 21.0s linear infinite; }
+    .flare-motion { animation: signal-flare 19.0s linear infinite; }
     .flare-layer, .scan-cues { opacity: 1; }
     @keyframes signal-flare {
       0%, 0.5% { transform: translateX(48.00px); opacity: 0; visibility: hidden; }
       2.5% { transform: translateX(48.00px); opacity: 1; visibility: visible; }
-      72.5% { transform: translateX(672.00px); opacity: 1; visibility: visible; }
-      77.5%, 100% { transform: translateX(672.00px); opacity: 0; visibility: hidden; }
+      82.5% { transform: translateX(672.00px); opacity: 1; visibility: visible; }
+      87.5%, 100% { transform: translateX(672.00px); opacity: 0; visibility: hidden; }
     }
     @media (prefers-reduced-motion: reduce) {
       .quiet-sweep { animation: none; transform: translateX(668.00px); opacity: 1; }
