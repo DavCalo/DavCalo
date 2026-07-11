@@ -55,7 +55,7 @@ GRID_ROW_GAP = 15.0
 RECENT_WEEK_LIMIT = 26
 SATELLITE_Y = 37.0
 SATELLITE_SCALE = 1.02
-SCAN_DURATION = 21.0
+SCAN_DURATION = 19.0
 TRAVEL_START = GRID_X0
 TRAVEL_END = GRID_X1
 FALLBACK_X = GRID_X1 - 4.0
@@ -387,8 +387,8 @@ def render_svg(calendar: Calendar, login: str, theme: str) -> str:
     @keyframes signal-flare {{
       0%, 0.5% {{ transform: translateX({TRAVEL_START:.2f}px); opacity: 0; visibility: hidden; }}
       2.5% {{ transform: translateX({TRAVEL_START:.2f}px); opacity: 1; visibility: visible; }}
-      72.5% {{ transform: translateX({TRAVEL_END:.2f}px); opacity: 1; visibility: visible; }}
-      77.5%, 100% {{ transform: translateX({TRAVEL_END:.2f}px); opacity: 0; visibility: hidden; }}
+      82.5% {{ transform: translateX({TRAVEL_END:.2f}px); opacity: 1; visibility: visible; }}
+      87.5%, 100% {{ transform: translateX({TRAVEL_END:.2f}px); opacity: 0; visibility: hidden; }}
     }}
     @media (prefers-reduced-motion: reduce) {{
       .quiet-sweep {{ animation: none; transform: translateX({FALLBACK_X:.2f}px); opacity: 1; }}
