@@ -38,14 +38,14 @@
 
 <p>
   <sub>
-    <strong>Signal Flare</strong> · A rolling 26-week view of my GitHub activity.
+    <strong>Signal Flare</strong> · A rolling 26-week view of my GitHub activity.<br />
     Active days flare as the satellite passes.
   </sub>
 </p>
 
 <p>
   <sub>
-    <strong>Python · GraphQL · SVG · GitHub Actions</strong> ·
+    Python · GraphQL · SVG · GitHub Actions ·
     <a href="scripts/generate_contribution_scan.py">Source</a> ·
     <a href=".github/workflows/contribution-scan.yml">Workflow</a>
   </sub>
@@ -53,7 +53,7 @@
 
 </div>
 
-I study Computer Engineering and build software where algorithms meet physical systems—from AI and industrial automation to embedded and space systems.
+I study Computer Engineering and build software across the boundary between algorithms and the physical world—from AI and industrial automation to embedded and space systems.
 
 ## Current missions
 
@@ -98,97 +98,40 @@ I study Computer Engineering and build software where algorithms meet physical s
   </tr>
 </table>
 
-## What I build
+## Engineering focus
 
-<table width="100%">
-  <tr>
-    <td width="50%" valign="top">
-      <strong>Intelligent software</strong><br />
-      AI-powered applications, machine vision, and automation workflows.
-    </td>
-    <td width="50%" valign="top">
-      <strong>Industrial systems</strong><br />
-      Robot programming, integration, and software for physical production environments.
-    </td>
-  </tr>
-  <tr>
-    <td width="50%" valign="top">
-      <strong>Embedded engineering</strong><br />
-      Low-level software, communication interfaces, and hardware-aware design.
-    </td>
-    <td width="50%" valign="top">
-      <strong>Space systems</strong><br />
-      CubeSat software, telemetry, and multidisciplinary engineering.
-    </td>
-  </tr>
-</table>
+**Intelligent software** — AI-powered applications, machine vision, and automation workflows.
 
-## Selected work
+**Industrial systems** — 6-axis robot programming, integration, and software for production environments.
 
-<table width="100%">
-  <tr>
-    <td>
-      <strong><a href="scripts/generate_contribution_scan.py">Signal Flare</a></strong><br />
-      Animated GitHub contribution telemetry generated from recent activity and published through a hardened workflow.<br />
-      <sub>Python · GraphQL · SVG · GitHub Actions</sub>
-    </td>
-    <td align="right" valign="middle">
-      <a href="scripts/generate_contribution_scan.py">Source</a><br />
-      <a href=".github/workflows/contribution-scan.yml">Workflow</a>
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <strong><a href="https://github.com/DavCalo/Monopoly">Monopoly</a></strong><br />
-      Simplified Monopoly game with human-versus-computer and computer-versus-computer modes.<br />
-      <sub>C++ · CMake</sub>
-    </td>
-    <td align="right" valign="middle">
-      <a href="https://github.com/DavCalo/Monopoly">Repository</a>
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <strong><a href="https://github.com/DavCalo/Klotski">Klotski</a></strong><br />
-      Java implementation of the Klotski puzzle developed as a software engineering project.<br />
-      <sub>Java · Maven · JUnit</sub>
-    </td>
-    <td align="right" valign="middle">
-      <a href="https://github.com/DavCalo/Klotski">Repository</a>
-    </td>
-  </tr>
-</table>
+**Embedded engineering** — Low-level software, communication interfaces, and hardware-aware design.
+
+**Space systems** — CubeSat software, telemetry, and multidisciplinary engineering.
 
 ## Engineering toolkit
 
-<table>
-  <tr>
-    <td><strong>Languages</strong></td>
-    <td>
-      <img src="https://img.shields.io/badge/C-475569?style=flat-square&logo=c&logoColor=white" alt="C" />
-      <img src="https://img.shields.io/badge/C++-00599C?style=flat-square&logo=c%2B%2B&logoColor=white" alt="C++" />
-      <img src="https://img.shields.io/badge/Java-ED8B00?style=flat-square&logo=openjdk&logoColor=white" alt="Java" />
-      <img src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=FFD43B" alt="Python" />
-      <img src="https://img.shields.io/badge/SQL-336791?style=flat-square&logo=postgresql&logoColor=white" alt="SQL" />
-    </td>
-  </tr>
-  <tr>
-    <td><strong>Industrial robotics</strong></td>
-    <td>
-      <img src="https://img.shields.io/badge/KUKA-KRL-F57C00?style=flat-square" alt="KUKA · KRL" />
-      <img src="https://img.shields.io/badge/Comau-PDL2-D71920?style=flat-square" alt="Comau · PDL2" />
-      <img src="https://img.shields.io/badge/Epson-SPEL%2B-003399?style=flat-square" alt="Epson · SPEL+" />
-    </td>
-  </tr>
-  <tr>
-    <td><strong>Tools &amp; platforms</strong></td>
-    <td>
-      <img src="https://img.shields.io/badge/Git-F05032?style=flat-square&logo=git&logoColor=white" alt="Git" />
-      <img src="https://img.shields.io/badge/GitHub_Actions-2088FF?style=flat-square&logo=githubactions&logoColor=white" alt="GitHub Actions" />
-      <img src="https://img.shields.io/badge/Terraform-844FBA?style=flat-square&logo=terraform&logoColor=white" alt="Terraform" />
-    </td>
-  </tr>
-</table>
+<p>
+  <strong>Languages</strong><br />
+  <img src="https://img.shields.io/badge/C-475569?style=flat-square&logo=c&logoColor=white" alt="C" />
+  <img src="https://img.shields.io/badge/C++-00599C?style=flat-square&logo=c%2B%2B&logoColor=white" alt="C++" />
+  <img src="https://img.shields.io/badge/Java-ED8B00?style=flat-square&logo=openjdk&logoColor=white" alt="Java" />
+  <img src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=FFD43B" alt="Python" />
+  <img src="https://img.shields.io/badge/SQL-336791?style=flat-square&logo=postgresql&logoColor=white" alt="SQL" />
+</p>
+
+<p>
+  <strong>Industrial robotics</strong><br />
+  <img src="https://img.shields.io/badge/KUKA-KRL-F57C00?style=flat-square" alt="KUKA · KRL" />
+  <img src="https://img.shields.io/badge/Comau-PDL2-D71920?style=flat-square" alt="Comau · PDL2" />
+  <img src="https://img.shields.io/badge/Epson-SPEL%2B-003399?style=flat-square" alt="Epson · SPEL+" />
+</p>
+
+<p>
+  <strong>Tools &amp; platforms</strong><br />
+  <img src="https://img.shields.io/badge/Git-F05032?style=flat-square&logo=git&logoColor=white" alt="Git" />
+  <img src="https://img.shields.io/badge/GitHub_Actions-2088FF?style=flat-square&logo=githubactions&logoColor=white" alt="GitHub Actions" />
+  <img src="https://img.shields.io/badge/Terraform-844FBA?style=flat-square&logo=terraform&logoColor=white" alt="Terraform" />
+</p>
 
 <p>
   <strong>Systems &amp; domains</strong><br />
