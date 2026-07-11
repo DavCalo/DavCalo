@@ -5,8 +5,8 @@ The horizontal axis is time (weeks), the vertical axis is weekday, and signal
 size/brightness represents contribution intensity. The latest 26 weeks are
 expanded across a compact canvas. A CubeSat performs one left-to-right pass,
 briefly turning active days into larger circles or technical four-point signal
-flares. A short trailing acquisition window reinforces the direction of travel,
-while the complete contribution matrix remains continuously visible.
+flares. A directional acquisition window leaves a brief visual echo behind the
+satellite, while the complete contribution matrix remains continuously visible.
 
 Only Python's standard library is required.
 """
@@ -47,25 +47,25 @@ query ContributionCalendar($login: String!) {
 """
 
 WIDTH = 720
-HEIGHT = 198
+HEIGHT = 192
 GRID_X0 = 48.0
 GRID_X1 = 672.0
-GRID_Y0 = 75.0
+GRID_Y0 = 72.0
 GRID_ROW_GAP = 15.0
 RECENT_WEEK_LIMIT = 26
-SATELLITE_Y = 37.0
-SATELLITE_SCALE = 1.02
-SCAN_DURATION = 19.0
+SATELLITE_Y = 38.0
+SATELLITE_SCALE = 1.05
+SCAN_DURATION = 21.0
 TRAVEL_START = GRID_X0
 TRAVEL_END = GRID_X1
 FALLBACK_X = GRID_X1 - 4.0
-CLIP_TOP = 68.0
-CLIP_BOTTOM = 172.0
-FLARE_MAIN_X = -18.0
-FLARE_MAIN_WIDTH = 30.0
-FLARE_CORE_X = -5.0
-FLARE_CORE_WIDTH = 10.0
-MARKER_Y = 55.0
+CLIP_TOP = 65.0
+CLIP_BOTTOM = 168.0
+FLARE_MAIN_X = -25.0
+FLARE_MAIN_WIDTH = 34.0
+FLARE_CORE_X = -4.5
+FLARE_CORE_WIDTH = 9.0
+MARKER_Y = 54.0
 
 
 @dataclass(frozen=True)
@@ -263,8 +263,8 @@ def build_signal_paths(
 ) -> tuple[dict[int, str], dict[int, str], dict[str, str]]:
     max_count = max((day.count for day in flatten_days(calendar)), default=0)
     base_radii = [1.70, 2.30, 2.90, 3.55, 4.20]
-    flare_radii = {1: 2.70 * 1.06, 2: 3.70 * 1.08}
-    star_sizes = {3: (6.80 * 1.10, 2.45 * 1.10), 4: (8.00 * 1.10, 2.85 * 1.10)}
+    flare_radii = {1: 2.88, 2: 4.02}
+    star_sizes = {3: (7.62, 2.64), 4: (9.12, 3.02)}
 
     base_parts: dict[int, list[str]] = {level: [] for level in range(5)}
     flare_parts: dict[int, list[str]] = {level: [] for level in range(1, 5)}
@@ -284,10 +284,10 @@ def build_signal_paths(
                 flare_parts[level].append(star_subpath(x, y, outer, inner))
 
             if level in (2, 3):
-                core_parts["mid"].append(circle_subpath(x, y, 1.32))
+                core_parts["mid"].append(circle_subpath(x, y, 1.40))
             elif level == 4:
-                core_parts["high"].append(circle_subpath(x, y, 1.87))
-                core_parts["high"].append(star_subpath(x, y, 3.30, 1.16))
+                core_parts["high"].append(circle_subpath(x, y, 2.05))
+                core_parts["high"].append(star_subpath(x, y, 3.82, 1.02))
 
     base = {level: "".join(parts) for level, parts in base_parts.items() if parts}
     flare = {level: "".join(parts) for level, parts in flare_parts.items() if parts}
@@ -387,8 +387,8 @@ def render_svg(calendar: Calendar, login: str, theme: str) -> str:
     @keyframes signal-flare {{
       0%, 0.5% {{ transform: translateX({TRAVEL_START:.2f}px); opacity: 0; visibility: hidden; }}
       2.5% {{ transform: translateX({TRAVEL_START:.2f}px); opacity: 1; visibility: visible; }}
-      82.5% {{ transform: translateX({TRAVEL_END:.2f}px); opacity: 1; visibility: visible; }}
-      87.5%, 100% {{ transform: translateX({TRAVEL_END:.2f}px); opacity: 0; visibility: hidden; }}
+      75% {{ transform: translateX({TRAVEL_END:.2f}px); opacity: 1; visibility: visible; }}
+      80%, 100% {{ transform: translateX({TRAVEL_END:.2f}px); opacity: 0; visibility: hidden; }}
     }}
     @media (prefers-reduced-motion: reduce) {{
       .quiet-sweep {{ animation: none; transform: translateX({FALLBACK_X:.2f}px); opacity: 1; }}
@@ -414,8 +414,8 @@ def render_svg(calendar: Calendar, login: str, theme: str) -> str:
     <g class="flare-layer flare-cores" clip-path="url(#sf-signal-flare-strong-core)" opacity="0">{core_markup}</g>
     <g class="quiet-sweep flare-motion" transform="translate({FALLBACK_X:.2f} 0)" opacity="1">
       <g class="scan-cues" opacity="0">
-        <line class="scan-line" x1="0" y1="50" x2="0" y2="69" stroke="{palette['scan']}" stroke-width="1" opacity="0.44" vector-effect="non-scaling-stroke"/>
-        <path d="M-3.5 70H3.5M-3.5 174H3.5" fill="none" stroke="{palette['scan']}" stroke-width="1" stroke-linecap="round" opacity="0.48" vector-effect="non-scaling-stroke"/>
+        <line class="scan-line" x1="0" y1="49" x2="0" y2="66" stroke="{palette['scan']}" stroke-width="1" opacity="0.48" vector-effect="non-scaling-stroke"/>
+        <path class="scan-aperture" d="M-5 55L-1.4 68M5 55L1.4 68M-4 69H4" fill="none" stroke="{palette['scan']}" stroke-width="1" stroke-linecap="round" opacity="0.52" vector-effect="non-scaling-stroke"/>
       </g>
       {render_satellite(palette)}
     </g>
