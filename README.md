@@ -55,105 +55,59 @@
 
 I study Computer Engineering and build software that moves from algorithms into real systems—from AI and industrial automation to embedded platforms and space missions.
 
-## Current missions
+## Current work
 
-<p align="center">
-  <sub>Building production software on Earth and embedded systems for orbit.</sub>
+<p>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/mip-logo-dark.png" />
+    <source media="(prefers-color-scheme: light)" srcset="assets/mip-logo-light.png" />
+    <img src="assets/mip-logo-light.png" height="28" align="middle" alt="MIP Technologies logo" />
+  </picture>
+  &nbsp;&nbsp;<strong><a href="https://www.miptechnologies.tech">MIP Technologies</a></strong>
+  · <sub>AI &amp; Software Development</sub><br />
+  Building AI-powered software and tailored digital systems.
 </p>
 
-<table width="100%">
-  <tr>
-    <td width="50%" align="center" valign="top">
-      <sub>PROFESSIONAL MISSION</sub>
-      <p>
-        <picture>
-          <source
-            media="(prefers-color-scheme: dark)"
-            srcset="assets/mip-logo-dark.png"
-          />
-          <source
-            media="(prefers-color-scheme: light)"
-            srcset="assets/mip-logo-light.png"
-          />
-          <img
-            src="assets/mip-logo-light.png"
-            height="48"
-            alt="MIP Technologies logo"
-          />
-        </picture>
-      </p>
-      <strong><a href="https://www.miptechnologies.tech">MIP Technologies</a></strong><br />
-      <sub>AI &amp; Software Development</sub>
-      <p>AI-powered software and tailored digital systems.</p>
-    </td>
-    <td width="50%" align="center" valign="top">
-      <sub>UNIVERSITY MISSION</sub>
-      <p>
-        <img
-          src="assets/albasat-logo.png"
-          height="56"
-          alt="AlbaSat UniPD logo"
-        />
-      </p>
-      <strong>AlbaSat UniPD</strong><br />
-      <sub>University CubeSat Project</sub>
-      <p>Embedded software for a multidisciplinary CubeSat mission.</p>
-    </td>
-  </tr>
-</table>
+<p>
+  <img src="assets/albasat-logo.png" height="34" align="middle" alt="AlbaSat UniPD logo" />
+  &nbsp;&nbsp;<strong>AlbaSat UniPD</strong>
+  · <sub>University CubeSat Project</sub><br />
+  Developing embedded software for a multidisciplinary CubeSat mission.
+</p>
 
-## Engineering systems
+## From intelligence to orbit
 
 <p align="center">
   <picture>
-    <source
-      media="(prefers-color-scheme: dark)"
-      srcset="assets/engineering-systems-dark.svg"
-    />
-    <source
-      media="(prefers-color-scheme: light)"
-      srcset="assets/engineering-systems-light.svg"
-    />
+    <source media="(prefers-color-scheme: dark)" srcset="assets/systems-ribbon-dark.svg" />
+    <source media="(prefers-color-scheme: light)" srcset="assets/systems-ribbon-light.svg" />
     <img
-      src="assets/engineering-systems-light.svg"
+      src="assets/systems-ribbon-light.svg"
       width="100%"
-      alt="Engineering systems architecture connecting intelligent software, industrial systems, embedded engineering, and space systems"
+      alt="A systems ribbon connecting intelligence, machines, embedded platforms, and space"
     />
   </picture>
 </p>
 
 <p align="center">
-  <sub>Software is the connective layer from intelligent applications to machines, embedded platforms, and space systems.</sub>
+  <sub>Software carries ideas from intelligent applications into machines, embedded platforms, and space systems.</sub>
 </p>
 
 ## Engineering toolkit
 
 <p>
   <strong>Languages</strong><br />
-  <img src="https://img.shields.io/badge/C-475569?style=flat-square&logo=c&logoColor=white" alt="C" />
-  <img src="https://img.shields.io/badge/C++-00599C?style=flat-square&logo=c%2B%2B&logoColor=white" alt="C++" />
-  <img src="https://img.shields.io/badge/Java-ED8B00?style=flat-square&logo=openjdk&logoColor=white" alt="Java" />
-  <img src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=FFD43B" alt="Python" />
-  <img src="https://img.shields.io/badge/SQL-336791?style=flat-square&logo=postgresql&logoColor=white" alt="SQL" />
+  <code>C</code> <code>C++</code> <code>Java</code> <code>Python</code> <code>SQL</code>
 </p>
 
 <p>
   <strong>Industrial robotics</strong><br />
-  <img src="https://img.shields.io/badge/KUKA-KRL-F57C00?style=flat-square" alt="KUKA · KRL" />
-  <img src="https://img.shields.io/badge/Comau-PDL2-D71920?style=flat-square" alt="Comau · PDL2" />
-  <img src="https://img.shields.io/badge/Epson-SPEL%2B-003399?style=flat-square" alt="Epson · SPEL+" />
+  <code>KUKA / KRL</code> <code>Comau / PDL2</code> <code>Epson / SPEL+</code>
 </p>
 
 <p>
-  <strong>Automation &amp; infrastructure</strong><br />
-  <img src="https://img.shields.io/badge/Git-F05032?style=flat-square&logo=git&logoColor=white" alt="Git" />
-  <img src="https://img.shields.io/badge/GitHub_Actions-2088FF?style=flat-square&logo=githubactions&logoColor=white" alt="GitHub Actions" />
-  <img src="https://img.shields.io/badge/Terraform-844FBA?style=flat-square&logo=terraform&logoColor=white" alt="Terraform" />
-</p>
-
-<p>
-  <strong>Systems &amp; domains</strong><br />
-  Machine vision · AI-powered software · Embedded systems · Low-level programming · Telemetry · CubeSat systems
+  <strong>Observability &amp; infrastructure</strong><br />
+  <code>Git</code> <code>GitHub Actions</code> <code>Terraform</code> <code>Datadog</code>
 </p>
 
 ---
