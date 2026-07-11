@@ -2,7 +2,7 @@
 
 # Davide Calò
 
-**Building software from intelligent systems to robots, embedded devices, and CubeSats.**
+**Engineering software where intelligence meets machines, embedded systems, and space.**
 
 <p>
   <a href="https://www.linkedin.com/in/davide-cal%C3%B2-632255390">
@@ -39,60 +39,62 @@
 <p>
   <sub>
     <strong>Signal Flare</strong> · A rolling 26-week view of my GitHub activity.
-    Each signal is one day; active days flare as the satellite passes.
+    Active days flare as the satellite passes.
   </sub>
 </p>
 
 <p>
   <sub>
-    Built with Python, GraphQL, SVG, and GitHub Actions ·
-    <a href="scripts/generate_contribution_scan.py">Explore the generator</a>
+    <strong>Python · GraphQL · SVG · GitHub Actions</strong> ·
+    <a href="scripts/generate_contribution_scan.py">View source</a>
   </sub>
 </p>
 
 </div>
 
-I study Computer Engineering and build software where algorithms meet physical systems—from **AI-powered applications** and **industrial automation** to **embedded systems** and **space projects**.
+I study Computer Engineering and build software where algorithms meet physical systems—from AI and industrial automation to embedded and space systems.
 
 ## Current missions
 
 <table width="100%">
   <tr>
-    <td width="50%" height="82" align="center" valign="middle">
-      <img
-        src="assets/mip-logo.png"
-        height="38"
-        alt="MIP Technologies logo"
-      />
-    </td>
-    <td width="50%" height="82" align="center" valign="middle">
-      <img
-        src="assets/albasat-logo.jpeg"
-        height="48"
-        alt="AlbaSat logo"
-      />
-    </td>
-  </tr>
-  <tr>
-    <td width="50%" height="36" align="center" valign="middle">
-      <strong><a href="https://www.miptechnologies.tech">MIP Technologies</a></strong>
-    </td>
-    <td width="50%" height="36" align="center" valign="middle">
-      <strong>AlbaSat UniPD</strong>
-    </td>
-  </tr>
-  <tr>
     <td width="50%" align="center" valign="top">
       <p>
-        <strong>AI &amp; Software Development</strong><br />
-        Contributing to AI-powered software and tailored digital solutions.
+        <picture>
+          <source
+            media="(prefers-color-scheme: dark)"
+            srcset="assets/mip-logo-dark.png"
+          />
+          <source
+            media="(prefers-color-scheme: light)"
+            srcset="assets/mip-logo-light.png"
+          />
+          <img
+            src="assets/mip-logo-light.png"
+            height="56"
+            alt="MIP Technologies logo"
+          />
+        </picture>
       </p>
+      <p>
+        <strong><a href="https://www.miptechnologies.tech">MIP Technologies</a></strong><br />
+        <sub>AI &amp; Software Development</sub>
+      </p>
+      <p>Building AI-powered software and tailored digital solutions.</p>
     </td>
     <td width="50%" align="center" valign="top">
       <p>
-        <strong>University CubeSat Project</strong><br />
-        Contributing to software and embedded systems for a university CubeSat mission.
+        <img
+          src="assets/albasat-logo.png"
+          height="56"
+          alt="AlbaSat UniPD logo"
+        />
       </p>
+      <p>
+        <strong>AlbaSat UniPD</strong><br />
+        <sub>University CubeSat Project</sub>
+      </p>
+      <p>Developing software and embedded systems for a university CubeSat mission.</p>
     </td>
   </tr>
 </table>
@@ -123,7 +125,7 @@ I study Computer Engineering and build software where algorithms meet physical s
 </p>
 
 <p>
-  <strong>Focus areas</strong><br />
+  <strong>Systems &amp; domains</strong><br />
   Machine vision · AI-powered software · Embedded systems · Low-level programming · CubeSat systems
 </p>
 
