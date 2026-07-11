@@ -3,9 +3,10 @@
 
 The horizontal axis is time (weeks), the vertical axis is weekday, and signal
 size/brightness represents contribution intensity. The latest 26 weeks are
-expanded across the canvas. A CubeSat performs one left-to-right pass, briefly
-turning active days into larger circles or technical four-point signal flares.
-The complete contribution matrix remains static and continuously visible.
+expanded across a compact canvas. A CubeSat performs one left-to-right pass,
+briefly turning active days into larger circles or technical four-point signal
+flares. A short trailing acquisition window reinforces the direction of travel,
+while the complete contribution matrix remains continuously visible.
 
 Only Python's standard library is required.
 """
@@ -46,20 +47,25 @@ query ContributionCalendar($login: String!) {
 """
 
 WIDTH = 720
-HEIGHT = 215
+HEIGHT = 198
 GRID_X0 = 48.0
 GRID_X1 = 672.0
-GRID_Y0 = 82.0
+GRID_Y0 = 75.0
 GRID_ROW_GAP = 15.0
 RECENT_WEEK_LIMIT = 26
-SATELLITE_Y = 44.0
-SATELLITE_SCALE = 0.97
+SATELLITE_Y = 37.0
+SATELLITE_SCALE = 1.02
 SCAN_DURATION = 21.0
 TRAVEL_START = GRID_X0
 TRAVEL_END = GRID_X1
 FALLBACK_X = GRID_X1 - 4.0
-CLIP_TOP = 75.0
-CLIP_BOTTOM = 179.0
+CLIP_TOP = 68.0
+CLIP_BOTTOM = 172.0
+FLARE_MAIN_X = -18.0
+FLARE_MAIN_WIDTH = 30.0
+FLARE_CORE_X = -5.0
+FLARE_CORE_WIDTH = 10.0
+MARKER_Y = 55.0
 
 
 @dataclass(frozen=True)
@@ -293,7 +299,8 @@ def render_base_paths(
     paths: dict[int, str],
     palette: dict[str, object],
 ) -> str:
-    opacities = [0.72, 0.78, 0.86, 0.94, 1.00]
+    # Keep inactive days readable while letting recent activity dominate.
+    opacities = [0.62, 0.80, 0.88, 0.96, 1.00]
     rendered: list[str] = []
     for level, data in paths.items():
         color = palette["zero"] if level == 0 else palette["levels"][level - 1]  # type: ignore[index]
@@ -391,23 +398,24 @@ def render_svg(calendar: Calendar, login: str, theme: str) -> str:
   </style>
   <defs>
     <clipPath id="sf-signal-flare-strong-main" clipPathUnits="userSpaceOnUse">
-      <rect class="flare-motion clip-motion" visibility="hidden" x="-14" y="{CLIP_TOP:.2f}" width="28" height="{CLIP_BOTTOM - CLIP_TOP:.2f}" transform="translate({FALLBACK_X:.2f} 0)"/>
+      <rect class="flare-motion clip-motion" visibility="hidden" x="{FLARE_MAIN_X:.2f}" y="{CLIP_TOP:.2f}" width="{FLARE_MAIN_WIDTH:.2f}" height="{CLIP_BOTTOM - CLIP_TOP:.2f}" transform="translate({FALLBACK_X:.2f} 0)"/>
     </clipPath>
     <clipPath id="sf-signal-flare-strong-core" clipPathUnits="userSpaceOnUse">
-      <rect class="flare-motion clip-motion" visibility="hidden" x="-5" y="{CLIP_TOP - 4:.2f}" width="10" height="{CLIP_BOTTOM - CLIP_TOP + 8:.2f}" transform="translate({FALLBACK_X:.2f} 0)"/>
+      <rect class="flare-motion clip-motion" visibility="hidden" x="{FLARE_CORE_X:.2f}" y="{CLIP_TOP - 4:.2f}" width="{FLARE_CORE_WIDTH:.2f}" height="{CLIP_BOTTOM - CLIP_TOP + 8:.2f}" transform="translate({FALLBACK_X:.2f} 0)"/>
     </clipPath>
   </defs>
   <g aria-hidden="true">
-    <g class="terminal-markers" fill="none" stroke="{palette['marker']}" stroke-width="1" opacity="0.38">
-      <circle cx="{geometry.x0:.2f}" cy="61" r="2.4"/><circle cx="{geometry.x1:.2f}" cy="61" r="2.4"/>
+    <g class="terminal-markers" stroke="{palette['marker']}" stroke-width="1" opacity="0.42" vector-effect="non-scaling-stroke">
+      <circle cx="{geometry.x0:.2f}" cy="{MARKER_Y:.2f}" r="2.4" fill="none"/>
+      <path d="M{geometry.x1 - 4:.2f} {MARKER_Y:.2f}L{geometry.x1:.2f} {MARKER_Y - 4:.2f}L{geometry.x1 + 4:.2f} {MARKER_Y:.2f}L{geometry.x1:.2f} {MARKER_Y + 4:.2f}Z" fill="{palette['marker']}" stroke="none"/>
     </g>
     <g class="signal-matrix">{base_markup}</g>
     <g class="flare-layer flare-main" clip-path="url(#sf-signal-flare-strong-main)" opacity="0">{flare_markup}</g>
     <g class="flare-layer flare-cores" clip-path="url(#sf-signal-flare-strong-core)" opacity="0">{core_markup}</g>
     <g class="quiet-sweep flare-motion" transform="translate({FALLBACK_X:.2f} 0)" opacity="1">
       <g class="scan-cues" opacity="0">
-        <line class="scan-line" x1="0" y1="56" x2="0" y2="76" stroke="{palette['scan']}" stroke-width="1" opacity="0.44"/>
-        <path d="M-3.5 77H3.5M-3.5 181H3.5" fill="none" stroke="{palette['scan']}" stroke-width="1" stroke-linecap="round" opacity="0.48"/>
+        <line class="scan-line" x1="0" y1="50" x2="0" y2="69" stroke="{palette['scan']}" stroke-width="1" opacity="0.44" vector-effect="non-scaling-stroke"/>
+        <path d="M-3.5 70H3.5M-3.5 174H3.5" fill="none" stroke="{palette['scan']}" stroke-width="1" stroke-linecap="round" opacity="0.48" vector-effect="non-scaling-stroke"/>
       </g>
       {render_satellite(palette)}
     </g>
