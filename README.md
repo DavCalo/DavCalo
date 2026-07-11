@@ -53,13 +53,18 @@
 
 </div>
 
-I study Computer Engineering and build software across the boundary between algorithms and the physical world—from AI and industrial automation to embedded and space systems.
+I study Computer Engineering and build software that moves from algorithms into real systems—from AI and industrial automation to embedded platforms and space missions.
 
 ## Current missions
+
+<p align="center">
+  <sub>Building production software on Earth and embedded systems for orbit.</sub>
+</p>
 
 <table width="100%">
   <tr>
     <td width="50%" align="center" valign="top">
+      <sub>PROFESSIONAL MISSION</sub>
       <p>
         <picture>
           <source
@@ -79,9 +84,10 @@ I study Computer Engineering and build software across the boundary between algo
       </p>
       <strong><a href="https://www.miptechnologies.tech">MIP Technologies</a></strong><br />
       <sub>AI &amp; Software Development</sub>
-      <p>AI-powered software and tailored digital solutions.</p>
+      <p>AI-powered software and tailored digital systems.</p>
     </td>
     <td width="50%" align="center" valign="top">
+      <sub>UNIVERSITY MISSION</sub>
       <p>
         <img
           src="assets/albasat-logo.png"
@@ -91,12 +97,12 @@ I study Computer Engineering and build software across the boundary between algo
       </p>
       <strong>AlbaSat UniPD</strong><br />
       <sub>University CubeSat Project</sub>
-      <p>Software and embedded systems for a university CubeSat mission.</p>
+      <p>Embedded software for a multidisciplinary CubeSat mission.</p>
     </td>
   </tr>
 </table>
 
-## Engineering systems map
+## Engineering systems
 
 <p align="center">
   <picture>
@@ -111,13 +117,13 @@ I study Computer Engineering and build software across the boundary between algo
     <img
       src="assets/engineering-systems-light.svg"
       width="100%"
-      alt="Systems map connecting intelligent software, industrial systems, embedded engineering, and space systems"
+      alt="Engineering systems architecture connecting intelligent software, industrial systems, embedded engineering, and space systems"
     />
   </picture>
 </p>
 
 <p align="center">
-  <sub>Software as the connective layer across AI, 6-axis robotics, embedded engineering, and CubeSat systems</sub>
+  <sub>Software is the connective layer from intelligent applications to machines, embedded platforms, and space systems.</sub>
 </p>
 
 ## Engineering toolkit
@@ -139,7 +145,7 @@ I study Computer Engineering and build software across the boundary between algo
 </p>
 
 <p>
-  <strong>Tools &amp; platforms</strong><br />
+  <strong>Automation &amp; infrastructure</strong><br />
   <img src="https://img.shields.io/badge/Git-F05032?style=flat-square&logo=git&logoColor=white" alt="Git" />
   <img src="https://img.shields.io/badge/GitHub_Actions-2088FF?style=flat-square&logo=githubactions&logoColor=white" alt="GitHub Actions" />
   <img src="https://img.shields.io/badge/Terraform-844FBA?style=flat-square&logo=terraform&logoColor=white" alt="Terraform" />
@@ -147,15 +153,15 @@ I study Computer Engineering and build software across the boundary between algo
 
 <p>
   <strong>Systems &amp; domains</strong><br />
-  Machine vision · AI-powered software · Embedded systems · Low-level programming · CubeSat systems
+  Machine vision · AI-powered software · Embedded systems · Low-level programming · Telemetry · CubeSat systems
 </p>
 
 ---
 
 <div align="center">
 
-**Let's build software that moves beyond the screen.**
+**Let's build systems that move beyond the screen.**
 
-Open to exchanging ideas and collaborating on software, automation, embedded systems, and space-oriented projects.
+Open to exchanging ideas and collaborating on intelligent software, automation, embedded engineering, and space systems.
 
 </div>
