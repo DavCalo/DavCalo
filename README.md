@@ -1,8 +1,8 @@
 <div align="center">
 
-# Hi, I'm Davide Calò 👋
+# Davide Calò
 
-**Building software that connects intelligent systems with the physical world.**
+**Building software from intelligent systems to robots, embedded devices, and CubeSats.**
 
 <p>
   <a href="https://www.linkedin.com/in/davide-cal%C3%B2-632255390">
@@ -19,11 +19,42 @@
   </a>
 </p>
 
+<p>
+  <picture>
+    <source
+      media="(prefers-color-scheme: dark)"
+      srcset="https://raw.githubusercontent.com/DavCalo/DavCalo/output/contribution-scan-dark.svg"
+    />
+    <source
+      media="(prefers-color-scheme: light)"
+      srcset="https://raw.githubusercontent.com/DavCalo/DavCalo/output/contribution-scan.svg"
+    />
+    <img
+      src="https://raw.githubusercontent.com/DavCalo/DavCalo/output/contribution-scan.svg"
+      alt="Davide Calò Signal Flare: an animated 26-week GitHub contribution telemetry scan"
+    />
+  </picture>
+</p>
+
+<p>
+  <sub>
+    <strong>Signal Flare</strong> · A rolling 26-week view of my GitHub activity.
+    Each signal is one day; active days flare as the satellite passes.
+  </sub>
+</p>
+
+<p>
+  <sub>
+    Built with Python, GraphQL, SVG, and GitHub Actions ·
+    <a href="scripts/generate_contribution_scan.py">Explore the generator</a>
+  </sub>
+</p>
+
 </div>
 
-I study Computer Engineering and enjoy building software that interacts with real systems—from AI-powered applications and industrial automation to embedded and space projects.
+I study Computer Engineering and build software where algorithms meet physical systems—from **AI-powered applications** and **industrial automation** to **embedded systems** and **space projects**.
 
-## Where I'm building
+## Current missions
 
 <table width="100%">
   <tr>
@@ -60,13 +91,13 @@ I study Computer Engineering and enjoy building software that interacts with rea
     <td width="50%" align="center" valign="top">
       <p>
         <strong>University CubeSat Project</strong><br />
-        Contributing to a multidisciplinary CubeSat project across software, embedded systems, and electronics.
+        Contributing to software and embedded systems for a university CubeSat mission.
       </p>
     </td>
   </tr>
 </table>
 
-## Core stack
+## Engineering toolkit
 
 <p>
   <strong>Languages</strong><br />
@@ -78,13 +109,6 @@ I study Computer Engineering and enjoy building software that interacts with rea
 </p>
 
 <p>
-  <strong>Development tools</strong><br />
-  <img src="https://img.shields.io/badge/Git-C2410C?style=flat-square&logo=git&logoColor=white" alt="Git" />
-  <img src="https://img.shields.io/badge/GitHub-24292F?style=flat-square&logo=github&logoColor=white" alt="GitHub" />
-  <img src="https://img.shields.io/badge/Terraform-5C4EE5?style=flat-square&logo=terraform&logoColor=white" alt="Terraform" />
-</p>
-
-<p>
   <strong>Industrial robotics</strong><br />
   <img src="https://img.shields.io/badge/KUKA-KRL-C2410C?style=flat-square" alt="KUKA · KRL" />
   <img src="https://img.shields.io/badge/Comau-PDL2-B91C1C?style=flat-square" alt="Comau · PDL2" />
@@ -92,37 +116,23 @@ I study Computer Engineering and enjoy building software that interacts with rea
 </p>
 
 <p>
-  <strong>Engineering areas</strong><br />
-  Machine vision · AI-powered software · Embedded systems · Low-level programming · CubeSat technology
+  <strong>Tools &amp; platforms</strong><br />
+  <img src="https://img.shields.io/badge/Git-C2410C?style=flat-square&logo=git&logoColor=white" alt="Git" />
+  <img src="https://img.shields.io/badge/GitHub_Actions-2088FF?style=flat-square&logo=githubactions&logoColor=white" alt="GitHub Actions" />
+  <img src="https://img.shields.io/badge/Terraform-5C4EE5?style=flat-square&logo=terraform&logoColor=white" alt="Terraform" />
 </p>
 
-## 🛰️ Contribution scan
-
-A satellite-inspired view of my GitHub activity, updated periodically. Each signal represents a day, with brightness reflecting contribution intensity.
-
-<p align="center">
-  <picture>
-    <source
-      media="(prefers-color-scheme: dark)"
-      srcset="https://raw.githubusercontent.com/DavCalo/DavCalo/output/contribution-scan-dark.svg"
-    />
-    <source
-      media="(prefers-color-scheme: light)"
-      srcset="https://raw.githubusercontent.com/DavCalo/DavCalo/output/contribution-scan.svg"
-    />
-    <img
-      src="https://raw.githubusercontent.com/DavCalo/DavCalo/output/contribution-scan.svg"
-      alt="Davide Calò animated GitHub contribution satellite scan"
-    />
-  </picture>
+<p>
+  <strong>Focus areas</strong><br />
+  Machine vision · AI-powered software · Embedded systems · Low-level programming · CubeSat systems
 </p>
 
 ---
 
 <div align="center">
 
-**Let's connect**
+**Let's build beyond the screen.**
 
-Open to exchanging ideas and collaborating on software, automation, and space-oriented projects.
+Open to exchanging ideas and collaborating on software, automation, embedded systems, and space-oriented projects.
 
 </div>
