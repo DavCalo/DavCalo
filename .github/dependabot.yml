@@ -1,0 +1,20 @@
+version: 2
+
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+      time: "09:00"
+      timezone: Europe/Rome
+    open-pull-requests-limit: 3
+    commit-message:
+      prefix: "build(deps)"
+    groups:
+      routine-github-actions:
+        applies-to: version-updates
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
