@@ -1,0 +1,4 @@
+# Security-sensitive profile automation
+/.github/workflows/ @DavCalo
+/.github/dependabot.yml @DavCalo
+/scripts/generate_contribution_scan.py @DavCalo
