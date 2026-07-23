@@ -12,6 +12,7 @@ on:
       - "scripts/generate_contribution_scan.py"
       - "assets/profile-hero-*.svg"
       - "assets/orbitops-feature-*.svg"
+      - "assets/engineering-stack-*.svg"
       - ".github/workflows/contribution-scan.yml"
 
 permissions:
@@ -71,6 +72,8 @@ jobs:
               "profile-hero-dark.svg": Path("assets/profile-hero-dark.svg"),
               "orbitops-feature-light.svg": Path("assets/orbitops-feature-light.svg"),
               "orbitops-feature-dark.svg": Path("assets/orbitops-feature-dark.svg"),
+              "engineering-stack-light.svg": Path("assets/engineering-stack-light.svg"),
+              "engineering-stack-dark.svg": Path("assets/engineering-stack-dark.svg"),
           }
           files = {**generated_files, **static_files}
 
@@ -133,7 +136,10 @@ jobs:
               )
               if "@keyframes" not in style:
                   raise SystemExit(f"{name} is missing animation keyframes")
-              if "prefers-reduced-motion: reduce" not in style and "prefers-reduced-motion:reduce" not in style:
+              if (
+                  "prefers-reduced-motion: reduce" not in style
+                  and "prefers-reduced-motion:reduce" not in style
+              ):
                   raise SystemExit(f"{name} is missing reduced-motion handling")
 
               signatures[name] = (
@@ -146,6 +152,7 @@ jobs:
           pairs = [
               ("profile-hero-light.svg", "profile-hero-dark.svg"),
               ("orbitops-feature-light.svg", "orbitops-feature-dark.svg"),
+              ("engineering-stack-light.svg", "engineering-stack-dark.svg"),
               ("contribution-scan.svg", "contribution-scan-dark.svg"),
           ]
           for light, dark in pairs:

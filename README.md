@@ -9,13 +9,13 @@
 <br />
 
 <a href="https://www.linkedin.com/in/davide-cal%C3%B2-632255390">
-  <img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn" />
+  <img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=flat-square&logo=linkedin&logoColor=white" alt="LinkedIn" />
 </a>
 <a href="mailto:calo.davide02@gmail.com">
-  <img src="https://img.shields.io/badge/Email-EA4335?style=for-the-badge&logo=gmail&logoColor=white" alt="Email" />
+  <img src="https://img.shields.io/badge/Email-EA4335?style=flat-square&logo=gmail&logoColor=white" alt="Email" />
 </a>
 <a href="https://github.com/DavCalo/OrbitOps">
-  <img src="https://img.shields.io/badge/Featured-OrbitOps-7C3AED?style=for-the-badge&logo=github&logoColor=white" alt="Featured project: OrbitOps" />
+  <img src="https://img.shields.io/badge/OrbitOps-Featured_system-7C3AED?style=flat-square&logo=github&logoColor=white" alt="Featured system: OrbitOps" />
 </a>
 
 </div>
@@ -25,10 +25,8 @@
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="assets/orbitops-feature-dark.svg" />
   <source media="(prefers-color-scheme: light)" srcset="assets/orbitops-feature-light.svg" />
-  <img src="assets/orbitops-feature-light.svg" width="100%" alt="OrbitOps deterministic CubeSat telemetry system" />
+  <img src="assets/orbitops-feature-light.svg" width="100%" alt="OrbitOps deterministic CubeSat telemetry architecture" />
 </picture>
-
-OrbitOps makes an end-to-end telemetry path concrete: a C++ on-board simulator emits binary packets, a deterministic UDP link applies reproducible faults, and a Python ground station validates, alarms, records, replays, and inspects the resulting evidence.
 
 <p align="center">
   <a href="https://github.com/DavCalo/OrbitOps"><strong>Explore OrbitOps</strong></a>
@@ -47,7 +45,7 @@ OrbitOps makes an end-to-end telemetry path concrete: a C++ on-board simulator e
         <img src="assets/albasat-logo.png" height="46" align="middle" alt="AlbaSat UniPD logo" />
         &nbsp;&nbsp;<strong>AlbaSat UniPD</strong>
       </p>
-      <p><img src="https://img.shields.io/badge/CubeSat-Embedded_Software-0891B2?style=flat-square" alt="CubeSat embedded software" /></p>
+      <p><sub>CubeSat · embedded software</sub></p>
       <p>Developing embedded software for a multidisciplinary university CubeSat mission.</p>
     </td>
     <td width="50%" valign="top">
@@ -59,7 +57,7 @@ OrbitOps makes an end-to-end telemetry path concrete: a C++ on-board simulator e
         </picture>
         &nbsp;&nbsp;<strong><a href="https://www.miptechnologies.tech">MIP Technologies</a></strong>
       </p>
-      <p><img src="https://img.shields.io/badge/AI_%26_Software-Development-7C3AED?style=flat-square" alt="AI and software development" /></p>
+      <p><sub>AI · software development</sub></p>
       <p>Building AI-powered applications and tailored software systems.</p>
     </td>
   </tr>
@@ -84,22 +82,11 @@ OrbitOps makes an end-to-end telemetry path concrete: a C++ on-board simulator e
 
 ## Engineering stack
 
-<p align="center">
-  <img src="https://img.shields.io/badge/C-0F766E?style=for-the-badge&logo=c&logoColor=white" alt="C" />
-  <img src="https://img.shields.io/badge/C%2B%2B-00599C?style=for-the-badge&logo=cplusplus&logoColor=white" alt="C++" />
-  <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=FFD43B" alt="Python" />
-  <img src="https://img.shields.io/badge/Java-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white" alt="Java" />
-  <img src="https://img.shields.io/badge/CMake-064F8C?style=for-the-badge&logo=cmake&logoColor=white" alt="CMake" />
-  <img src="https://img.shields.io/badge/GitHub_Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white" alt="GitHub Actions" />
-</p>
-<p align="center">
-  <img src="https://img.shields.io/badge/Industrial_Robotics-E11D48?style=flat-square" alt="Industrial robotics" />
-  <img src="https://img.shields.io/badge/Binary_Protocols-0891B2?style=flat-square" alt="Binary protocols" />
-  <img src="https://img.shields.io/badge/Networking-2563EB?style=flat-square" alt="Networking" />
-  <img src="https://img.shields.io/badge/Testing-7C3AED?style=flat-square" alt="Testing" />
-  <img src="https://img.shields.io/badge/Terraform-7B42BC?style=flat-square&logo=terraform&logoColor=white" alt="Terraform" />
-  <img src="https://img.shields.io/badge/Datadog-632CA6?style=flat-square&logo=datadog&logoColor=white" alt="Datadog" />
-</p>
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/engineering-stack-dark.svg" />
+  <source media="(prefers-color-scheme: light)" srcset="assets/engineering-stack-light.svg" />
+  <img src="assets/engineering-stack-light.svg" width="100%" alt="Engineering stack grouped into systems, software, automation, and reliability" />
+</picture>
 
 ---
 
