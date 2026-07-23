@@ -2,9 +2,17 @@
 
 # Davide Calò
 
-**Systems & Embedded Software Engineering**
+### Systems & Embedded Software Engineering
 
 Computer Engineering student building reliable software for embedded platforms, automation, and space systems.
+
+<p>
+  <code>C++</code>
+  <code>Python</code>
+  <code>Embedded systems</code>
+  <code>Telemetry</code>
+  <code>Automation</code>
+</p>
 
 <p>
   <a href="https://www.linkedin.com/in/davide-cal%C3%B2-632255390">
@@ -17,72 +25,86 @@ Computer Engineering student building reliable software for embedded platforms, 
 
 </div>
 
-## Featured project
+---
 
-### [OrbitOps](https://github.com/DavCalo/OrbitOps)
-
-A dependency-light CubeSat telemetry platform that makes the complete path from on-board packet generation to ground-station inspection concrete and reproducible.
-
-```text
-C++ on-board simulator → deterministic UDP link → Python ground station
-```
-
-- **Deterministic fault injection** — seeded packet loss, latency, jitter, duplication, corruption, and reordering.
-- **Auditable telemetry** — versioned packet, mission-profile, alarm-policy, event-log, and report contracts.
-- **Engineering assurance** — cross-platform CI, sanitizers, typing, coverage, parser mutation tests, packaging, and installed demos.
-
-`C++17` · `Python` · `UDP` · `CMake` · `TOML` · `GitHub Actions`
-
-[Explore the repository](https://github.com/DavCalo/OrbitOps) · [Read the architecture](https://github.com/DavCalo/OrbitOps/blob/main/docs/architecture.md) · [Run the demo](https://github.com/DavCalo/OrbitOps#quick-start)
-
-## Currently working on
+## Featured work
 
 <table>
   <tr>
-    <td width="50%" valign="top">
-      <strong>AlbaSat UniPD</strong><br />
-      <sub>University CubeSat project</sub>
-      <br /><br />
-      Developing embedded software for a multidisciplinary CubeSat mission.
+    <td width="62%" valign="top">
+      <h3><a href="https://github.com/DavCalo/OrbitOps">OrbitOps</a></h3>
+      <p><strong>Deterministic CubeSat telemetry from on-board simulation to ground-station inspection.</strong></p>
+      <p>
+        A dependency-light platform that generates binary telemetry in C++, applies reproducible
+        UDP link faults, and validates, records, alarms, replays, and inspects mission evidence in Python.
+      </p>
+      <p>
+        <code>deterministic faults</code>
+        <code>versioned contracts</code>
+        <code>auditable alarms</code>
+        <code>quality gates</code>
+      </p>
+      <p>
+        <a href="https://github.com/DavCalo/OrbitOps"><strong>Explore the repository →</strong></a><br />
+        <sub>
+          <a href="https://github.com/DavCalo/OrbitOps/blob/main/docs/architecture.md">Architecture</a>
+          ·
+          <a href="https://github.com/DavCalo/OrbitOps#quick-start">Quick start</a>
+        </sub>
+      </p>
     </td>
-    <td width="50%" valign="top">
-      <strong><a href="https://www.miptechnologies.tech">MIP Technologies</a></strong><br />
-      <sub>AI &amp; software development</sub>
-      <br /><br />
-      Building AI-powered applications and tailored software systems.
+    <td width="38%" valign="top">
+      <p><strong>System path</strong></p>
+      <p>
+        <code>C++ on-board simulator</code><br />
+        ↓ UDP telemetry<br /><br />
+        <code>Deterministic link</code><br />
+        ↓ validated packets<br /><br />
+        <code>Python ground station</code>
+      </p>
+      <p>
+        <sub>C++17 · Python · UDP · CMake · TOML · GitHub Actions</sub>
+      </p>
     </td>
   </tr>
 </table>
 
-## Engineering focus
+## Current missions
 
 <table>
   <tr>
-    <td width="33%" valign="top">
-      <strong>Systems &amp; embedded</strong><br /><br />
-      <code>C</code> <code>C++</code><br />
-      Binary protocols<br />
-      Networking<br />
-      CMake
+    <td width="50%" valign="top">
+      <p>
+        <img src="assets/albasat-logo.png" height="42" align="middle" alt="AlbaSat UniPD logo" />
+        &nbsp;&nbsp;<strong>AlbaSat UniPD</strong>
+      </p>
+      <p>
+        <sub>University CubeSat project</sub>
+      </p>
+      <p>
+        Developing embedded software for a multidisciplinary CubeSat mission.
+      </p>
     </td>
-    <td width="33%" valign="top">
-      <strong>Software engineering</strong><br /><br />
-      <code>Python</code> <code>Java</code><br />
-      Testing<br />
-      Packaging<br />
-      GitHub Actions
-    </td>
-    <td width="33%" valign="top">
-      <strong>Automation &amp; infrastructure</strong><br /><br />
-      Industrial robotics<br />
-      Terraform<br />
-      Datadog<br />
-      Git
+    <td width="50%" valign="top">
+      <p>
+        <picture>
+          <source media="(prefers-color-scheme: dark)" srcset="assets/mip-logo-dark.png" />
+          <source media="(prefers-color-scheme: light)" srcset="assets/mip-logo-light.png" />
+          <img src="assets/mip-logo-light.png" height="28" align="middle" alt="MIP Technologies logo" />
+        </picture>
+        &nbsp;&nbsp;<strong><a href="https://www.miptechnologies.tech">MIP Technologies</a></strong>
+      </p>
+      <p>
+        <sub>AI &amp; software development</sub>
+      </p>
+      <p>
+        Building AI-powered applications and tailored software systems.
+      </p>
     </td>
   </tr>
 </table>
 
-## Contribution telemetry
+## Activity, visualized
 
 <p align="center">
   <picture>
@@ -94,10 +116,36 @@ C++ on-board simulator → deterministic UDP link → Python ground station
 
 <p align="center">
   <sub>
-    A rolling 26-week activity window generated with
-    <a href="scripts/generate_contribution_scan.py">Python</a>, GitHub GraphQL, SVG, and GitHub Actions.
+    A rolling 26-week contribution window generated with
+    <a href="scripts/generate_contribution_scan.py">Python</a>,
+    GitHub GraphQL, SVG, and GitHub Actions.
   </sub>
 </p>
+
+## Engineering focus
+
+<table>
+  <tr>
+    <td width="50%" valign="top">
+      <strong>Systems &amp; embedded</strong><br /><br />
+      <code>C</code> <code>C++</code> · binary protocols · networking · CMake
+    </td>
+    <td width="50%" valign="top">
+      <strong>Telemetry &amp; reliability</strong><br /><br />
+      deterministic simulation · parsing · observability · testing
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <strong>Software engineering</strong><br /><br />
+      <code>Python</code> <code>Java</code> · packaging · API design · GitHub Actions
+    </td>
+    <td width="50%" valign="top">
+      <strong>Automation &amp; infrastructure</strong><br /><br />
+      industrial robotics · Terraform · Datadog · Git
+    </td>
+  </tr>
+</table>
 
 ---
 
