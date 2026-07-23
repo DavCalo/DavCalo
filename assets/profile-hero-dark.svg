@@ -1,0 +1,99 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="420" viewBox="0 0 1200 420" role="img" aria-labelledby="title desc">
+  <title id="title">Davide Calò — systems and embedded software engineering</title>
+  <desc id="desc">Animated technical profile banner with a CubeSat crossing an orbital path and a signal travelling from intelligent software through automation and embedded systems to orbit.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#050816"/><stop offset="1" stop-color="#0B1028"/>
+    </linearGradient>
+    <linearGradient id="signal" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#EC4899"/><stop offset=".36" stop-color="#FB923C"/><stop offset=".68" stop-color="#22D3EE"/><stop offset="1" stop-color="#8B5CF6"/>
+    </linearGradient>
+    <radialGradient id="glow-a"><stop offset="0" stop-color="#8B5CF6" stop-opacity=".32"/><stop offset="1" stop-color="#8B5CF6" stop-opacity="0"/></radialGradient>
+    <radialGradient id="glow-b"><stop offset="0" stop-color="#22D3EE" stop-opacity=".24"/><stop offset="1" stop-color="#22D3EE" stop-opacity="0"/></radialGradient>
+    <filter id="soft-glow" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="5" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+  <style>
+    text { font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    .title { font-size:58px;font-weight:760;letter-spacing:-1.8px;fill:#F8FAFC; }
+    .eyebrow { font-size:14px;font-weight:700;letter-spacing:3.2px;fill:#22D3EE; }
+    .subtitle { font-size:23px;font-weight:560;fill:#A7B4D0; }
+    .tagline { font-size:17px;font-weight:450;fill:#A7B4D0; }
+    .pill-text { font-size:13px;font-weight:650;fill:#F8FAFC; }
+    .node-label { font-size:12px;font-weight:700;letter-spacing:1.4px; }
+    .twinkle { animation: twinkle 4s ease-in-out infinite alternate; }
+    .satellite { transform:translate(930px,108px) rotate(-6deg); animation:satellite-pass 18s cubic-bezier(.42,.02,.3,1) infinite; }
+    .signal-dot { animation:signal-pulse 8s cubic-bezier(.4,0,.2,1) infinite; }
+    .signal-line { stroke-dasharray:8 12; animation:dash 12s linear infinite; }
+    .node-pulse { animation:node-pulse 3s ease-in-out infinite alternate; }
+    @keyframes satellite-pass {
+      0%,8% { transform:translate(850px,84px) rotate(-10deg); opacity:0; }
+      13% { opacity:1; }
+      34% { transform:translate(1010px,74px) rotate(4deg); opacity:1; }
+      53% { transform:translate(1080px,160px) rotate(17deg); opacity:1; }
+      62%,100% { transform:translate(1130px,225px) rotate(24deg); opacity:0; }
+    }
+    @keyframes signal-pulse {
+      0%,8% { transform:translateX(0);opacity:0; } 12% { opacity:1; }
+      82% { transform:translateX(660px);opacity:1; } 90%,100% { transform:translateX(660px);opacity:0; }
+    }
+    @keyframes twinkle { from { opacity:.18; } to { opacity:.86; } }
+    @keyframes dash { to { stroke-dashoffset:-400; } }
+    @keyframes node-pulse { from { opacity:.35; } to { opacity:1;filter:drop-shadow(0 0 5px currentColor); } }
+    @media (prefers-reduced-motion: reduce) {
+      .twinkle,.satellite,.signal-dot,.signal-line,.node-pulse { animation:none!important; }
+      .satellite { transform:translate(1015px,98px) rotate(5deg);opacity:1; }
+      .signal-dot { transform:translateX(430px);opacity:1; }
+    }
+  </style>
+  <rect x="1" y="1" width="1198" height="418" rx="30" fill="url(#bg)" stroke="#33466F" stroke-width="2"/>
+  <circle cx="1010" cy="90" r="260" fill="url(#glow-a)"/><circle cx="875" cy="270" r="235" fill="url(#glow-b)"/>
+  <g opacity=".22" stroke="#24335D" stroke-width="1">
+    <path d="M40 75H1160M40 145H1160M40 215H1160M40 285H1160M40 355H1160"/>
+    <path d="M120 28V392M240 28V392M360 28V392M480 28V392M600 28V392M720 28V392M840 28V392M960 28V392M1080 28V392"/>
+  </g>
+  <g><circle class="twinkle" cx="480.3" cy="281.1" r="1.4" fill="#EC4899" opacity="0.61" style="animation-delay:-1.73s;animation-duration:2.82s"/><circle class="twinkle" cx="284.1" cy="327.4" r="0.9" fill="#EC4899" opacity="0.44" style="animation-delay:-4.91s;animation-duration:6.02s"/><circle class="twinkle" cx="683.5" cy="299.3" r="0.7" fill="#22D3EE" opacity="0.42" style="animation-delay:-2.86s;animation-duration:6.22s"/><circle class="twinkle" cx="313.4" cy="216.9" r="0.7" fill="#EC4899" opacity="0.53" style="animation-delay:-1.19s;animation-duration:4.24s"/><circle class="twinkle" cx="692.1" cy="372.5" r="1.4" fill="#EC4899" opacity="0.49" style="animation-delay:-3.57s;animation-duration:4.71s"/><circle class="twinkle" cx="307.8" cy="145.5" r="1.8" fill="#F8FAFC" opacity="0.61" style="animation-delay:-4.18s;animation-duration:5.74s"/><circle class="twinkle" cx="1114.3" cy="81.3" r="0.7" fill="#EC4899" opacity="0.49" style="animation-delay:-0.72s;animation-duration:5.21s"/><circle class="twinkle" cx="524.8" cy="61.7" r="1.4" fill="#F8FAFC" opacity="0.42" style="animation-delay:-0.16s;animation-duration:3.52s"/><circle class="twinkle" cx="859.0" cy="163.0" r="0.9" fill="#3B82F6" opacity="0.20" style="animation-delay:-3.83s;animation-duration:5.26s"/><circle class="twinkle" cx="345.3" cy="79.0" r="0.9" fill="#EC4899" opacity="0.55" style="animation-delay:-2.03s;animation-duration:4.47s"/><circle class="twinkle" cx="1104.1" cy="320.9" r="0.9" fill="#8B5CF6" opacity="0.56" style="animation-delay:-1.20s;animation-duration:3.10s"/><circle class="twinkle" cx="681.4" cy="378.0" r="1.1" fill="#8B5CF6" opacity="0.55" style="animation-delay:-2.89s;animation-duration:4.61s"/><circle class="twinkle" cx="385.3" cy="143.6" r="0.9" fill="#22D3EE" opacity="0.58" style="animation-delay:-3.77s;animation-duration:6.17s"/><circle class="twinkle" cx="632.9" cy="327.0" r="1.1" fill="#22D3EE" opacity="0.27" style="animation-delay:-0.79s;animation-duration:5.41s"/><circle class="twinkle" cx="617.5" cy="109.1" r="1.8" fill="#3B82F6" opacity="0.33" style="animation-delay:-1.76s;animation-duration:5.68s"/><circle class="twinkle" cx="109.9" cy="254.9" r="1.4" fill="#8B5CF6" opacity="0.46" style="animation-delay:-0.20s;animation-duration:4.71s"/><circle class="twinkle" cx="723.3" cy="149.3" r="0.9" fill="#F8FAFC" opacity="0.22" style="animation-delay:-1.98s;animation-duration:3.74s"/><circle class="twinkle" cx="587.3" cy="339.0" r="1.1" fill="#8B5CF6" opacity="0.31" style="animation-delay:-1.71s;animation-duration:4.09s"/><circle class="twinkle" cx="108.0" cy="248.9" r="1.8" fill="#EC4899" opacity="0.52" style="animation-delay:-3.51s;animation-duration:3.81s"/><circle class="twinkle" cx="581.9" cy="151.2" r="1.8" fill="#3B82F6" opacity="0.53" style="animation-delay:-0.26s;animation-duration:3.08s"/><circle class="twinkle" cx="751.4" cy="367.4" r="0.7" fill="#22D3EE" opacity="0.53" style="animation-delay:-0.28s;animation-duration:3.17s"/><circle class="twinkle" cx="103.1" cy="33.7" r="1.1" fill="#8B5CF6" opacity="0.23" style="animation-delay:-2.35s;animation-duration:4.66s"/><circle class="twinkle" cx="1095.7" cy="21.3" r="1.4" fill="#3B82F6" opacity="0.50" style="animation-delay:-0.57s;animation-duration:4.59s"/><circle class="twinkle" cx="568.9" cy="105.0" r="1.4" fill="#EC4899" opacity="0.22" style="animation-delay:-1.16s;animation-duration:3.80s"/><circle class="twinkle" cx="112.5" cy="61.7" r="1.1" fill="#3B82F6" opacity="0.53" style="animation-delay:-1.29s;animation-duration:4.61s"/><circle class="twinkle" cx="943.7" cy="157.2" r="1.4" fill="#8B5CF6" opacity="0.51" style="animation-delay:-1.11s;animation-duration:5.54s"/><circle class="twinkle" cx="399.7" cy="82.8" r="1.8" fill="#EC4899" opacity="0.52" style="animation-delay:-4.13s;animation-duration:6.18s"/><circle class="twinkle" cx="861.1" cy="50.1" r="1.1" fill="#F8FAFC" opacity="0.62" style="animation-delay:-3.62s;animation-duration:5.61s"/><circle class="twinkle" cx="481.4" cy="270.7" r="1.8" fill="#3B82F6" opacity="0.37" style="animation-delay:-4.43s;animation-duration:6.47s"/><circle class="twinkle" cx="995.5" cy="26.7" r="1.8" fill="#F8FAFC" opacity="0.27" style="animation-delay:-2.72s;animation-duration:5.48s"/><circle class="twinkle" cx="1039.0" cy="177.2" r="1.1" fill="#22D3EE" opacity="0.24" style="animation-delay:-2.44s;animation-duration:6.15s"/><circle class="twinkle" cx="1035.9" cy="181.8" r="0.9" fill="#22D3EE" opacity="0.35" style="animation-delay:-1.69s;animation-duration:4.09s"/><circle class="twinkle" cx="81.5" cy="49.0" r="0.9" fill="#EC4899" opacity="0.28" style="animation-delay:-2.36s;animation-duration:5.99s"/><circle class="twinkle" cx="869.2" cy="218.7" r="0.9" fill="#EC4899" opacity="0.55" style="animation-delay:-3.21s;animation-duration:3.96s"/><circle class="twinkle" cx="581.4" cy="227.9" r="0.7" fill="#8B5CF6" opacity="0.51" style="animation-delay:-0.51s;animation-duration:5.12s"/><circle class="twinkle" cx="808.3" cy="45.3" r="0.9" fill="#22D3EE" opacity="0.26" style="animation-delay:-0.66s;animation-duration:6.34s"/><circle class="twinkle" cx="793.9" cy="32.6" r="1.4" fill="#F8FAFC" opacity="0.42" style="animation-delay:-4.53s;animation-duration:6.07s"/><circle class="twinkle" cx="475.5" cy="172.9" r="1.4" fill="#3B82F6" opacity="0.27" style="animation-delay:-4.40s;animation-duration:2.97s"/><circle class="twinkle" cx="26.6" cy="73.4" r="1.8" fill="#22D3EE" opacity="0.27" style="animation-delay:-3.68s;animation-duration:4.25s"/><circle class="twinkle" cx="1004.4" cy="346.2" r="1.1" fill="#EC4899" opacity="0.51" style="animation-delay:-3.01s;animation-duration:3.64s"/><circle class="twinkle" cx="693.9" cy="371.3" r="0.9" fill="#8B5CF6" opacity="0.41" style="animation-delay:-0.57s;animation-duration:4.89s"/><circle class="twinkle" cx="1054.5" cy="317.9" r="0.7" fill="#22D3EE" opacity="0.50" style="animation-delay:-2.60s;animation-duration:4.54s"/><circle class="twinkle" cx="343.7" cy="42.1" r="1.4" fill="#8B5CF6" opacity="0.40" style="animation-delay:-1.91s;animation-duration:3.27s"/><circle class="twinkle" cx="128.9" cy="278.7" r="1.1" fill="#8B5CF6" opacity="0.39" style="animation-delay:-0.44s;animation-duration:2.98s"/><circle class="twinkle" cx="849.1" cy="289.0" r="1.4" fill="#3B82F6" opacity="0.26" style="animation-delay:-2.59s;animation-duration:4.64s"/><circle class="twinkle" cx="40.3" cy="40.9" r="0.7" fill="#8B5CF6" opacity="0.39" style="animation-delay:-4.99s;animation-duration:3.22s"/><circle class="twinkle" cx="445.7" cy="275.5" r="1.1" fill="#F8FAFC" opacity="0.51" style="animation-delay:-2.83s;animation-duration:4.01s"/><circle class="twinkle" cx="60.2" cy="198.4" r="1.1" fill="#22D3EE" opacity="0.59" style="animation-delay:-2.11s;animation-duration:3.90s"/><circle class="twinkle" cx="1095.7" cy="199.0" r="0.9" fill="#3B82F6" opacity="0.47" style="animation-delay:-3.27s;animation-duration:5.34s"/><circle class="twinkle" cx="898.0" cy="101.5" r="1.1" fill="#EC4899" opacity="0.19" style="animation-delay:-0.71s;animation-duration:6.03s"/><circle class="twinkle" cx="617.7" cy="280.5" r="1.8" fill="#3B82F6" opacity="0.25" style="animation-delay:-4.85s;animation-duration:3.99s"/><circle class="twinkle" cx="633.1" cy="375.9" r="1.1" fill="#F8FAFC" opacity="0.32" style="animation-delay:-0.86s;animation-duration:4.87s"/><circle class="twinkle" cx="999.0" cy="134.1" r="1.8" fill="#F8FAFC" opacity="0.60" style="animation-delay:-1.40s;animation-duration:3.00s"/><circle class="twinkle" cx="43.8" cy="372.7" r="1.8" fill="#3B82F6" opacity="0.44" style="animation-delay:-0.38s;animation-duration:4.66s"/><circle class="twinkle" cx="87.2" cy="332.5" r="1.8" fill="#8B5CF6" opacity="0.21" style="animation-delay:-2.09s;animation-duration:3.55s"/><circle class="twinkle" cx="1024.8" cy="104.1" r="0.7" fill="#F8FAFC" opacity="0.23" style="animation-delay:-0.21s;animation-duration:4.68s"/></g>
+  <text x="68" y="76" class="eyebrow">COMPUTER ENGINEERING · SYSTEMS / EMBEDDED / SPACE</text>
+  <text x="68" y="145" class="title">Davide Calò</text>
+  <text x="70" y="187" class="subtitle">Building reliable software from algorithms to orbit.</text>
+  <text x="70" y="222" class="tagline">C++ · Python · telemetry · automation · embedded platforms</text>
+  <g transform="translate(68 252)">
+    <rect width="105" height="34" rx="17" fill="#121D42" stroke="#2B3C68"/><text x="52.5" y="22" text-anchor="middle" class="pill-text">SYSTEMS</text>
+    <rect x="116" width="115" height="34" rx="17" fill="#121D42" stroke="#2B3C68"/><text x="173.5" y="22" text-anchor="middle" class="pill-text">EMBEDDED</text>
+    <rect x="242" width="118" height="34" rx="17" fill="#121D42" stroke="#2B3C68"/><text x="301" y="22" text-anchor="middle" class="pill-text">TELEMETRY</text>
+    <rect x="371" width="122" height="34" rx="17" fill="#121D42" stroke="#2B3C68"/><text x="432" y="22" text-anchor="middle" class="pill-text">AUTOMATION</text>
+  </g>
+  <path d="M110 340H770" class="signal-line" fill="none" stroke="url(#signal)" stroke-width="3" opacity=".78"/>
+  <g>
+          <circle cx="110" cy="340" r="8" fill="#050816" stroke="#EC4899" stroke-width="2"/>
+          <circle class="node-pulse" cx="110" cy="340" r="3" fill="#EC4899"/>
+          <text x="110" y="374" text-anchor="middle" class="node-label" fill="#A7B4D0">INTELLIGENCE</text>
+        </g><g>
+          <circle cx="330" cy="340" r="8" fill="#050816" stroke="#FB923C" stroke-width="2"/>
+          <circle class="node-pulse" cx="330" cy="340" r="3" fill="#FB923C"/>
+          <text x="330" y="374" text-anchor="middle" class="node-label" fill="#A7B4D0">AUTOMATION</text>
+        </g><g>
+          <circle cx="550" cy="340" r="8" fill="#050816" stroke="#22D3EE" stroke-width="2"/>
+          <circle class="node-pulse" cx="550" cy="340" r="3" fill="#22D3EE"/>
+          <text x="550" y="374" text-anchor="middle" class="node-label" fill="#A7B4D0">EMBEDDED</text>
+        </g><g>
+          <circle cx="770" cy="340" r="8" fill="#050816" stroke="#8B5CF6" stroke-width="2"/>
+          <circle class="node-pulse" cx="770" cy="340" r="3" fill="#8B5CF6"/>
+          <text x="770" y="374" text-anchor="middle" class="node-label" fill="#A7B4D0">ORBIT</text>
+        </g>
+  <circle class="signal-dot" cx="110" cy="340" r="7" fill="#FFFFFF" stroke="#22D3EE" stroke-width="3" filter="url(#soft-glow)"/>
+  <path d="M824 274Q945 165 1130 252" fill="none" stroke="#8B5CF6" stroke-width="2.4" opacity=".48" stroke-dasharray="4 8"/>
+  <circle cx="1125" cy="270" r="78" fill="#111C40" stroke="#33466F" stroke-width="2"/>
+  <path d="M1063 267Q1110 235 1178 274" fill="none" stroke="#22D3EE" stroke-width="4" opacity=".35"/>
+  <g class="satellite" filter="url(#soft-glow)"><g class="sat-body">
+      <path d="M-22 0H-13M13 0H22" stroke="#9EACCF" stroke-width="2" stroke-linecap="round"/>
+      <rect x="-48" y="-13" width="26" height="26" rx="4" fill="#3B82F6" stroke="#22D3EE" stroke-width="1.4"/>
+      <path d="M-39.3-13V13M-30.7-13V13M-48 0H-22" stroke="#22D3EE" stroke-width="1" opacity=".72"/>
+      <rect x="22" y="-13" width="26" height="26" rx="4" fill="#3B82F6" stroke="#22D3EE" stroke-width="1.4"/>
+      <path d="M30.7-13V13M39.3-13V13M22 0H48" stroke="#22D3EE" stroke-width="1" opacity=".72"/>
+      <rect x="-13" y="-16" width="26" height="32" rx="6" fill="#E8EEFF" stroke="#9EACCF" stroke-width="1.8"/>
+      <circle cx="0" cy="0" r="6.5" fill="none" stroke="#8B5CF6" stroke-width="2"/>
+      <circle cx="0" cy="0" r="3" fill="#EC4899"/>
+      <path d="M0-16V-29M-7-34Q0-26 7-34" fill="none" stroke="#9EACCF" stroke-width="1.8" stroke-linecap="round"/>
+      <circle cx="0" cy="-31" r="2.2" fill="#22D3EE"/>
+    </g></g>
+</svg>

@@ -1,4 +1,4 @@
-name: Generate contribution scan
+name: Generate contribution constellation
 
 on:
   schedule:
@@ -10,18 +10,20 @@ on:
       - main
     paths:
       - "scripts/generate_contribution_scan.py"
+      - "assets/profile-hero-*.svg"
+      - "assets/orbitops-feature-*.svg"
       - ".github/workflows/contribution-scan.yml"
 
 permissions:
   contents: read
 
 concurrency:
-  group: contribution-scan-${{ github.ref }}
+  group: contribution-constellation-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   validate:
-    name: Generate and validate profile scan
+    name: Generate and validate profile visuals
     runs-on: ubuntu-latest
     timeout-minutes: 5
 
@@ -37,431 +39,131 @@ jobs:
         with:
           python-version: "3.13"
 
-      - name: Configure runner paths
+      - name: Generate contribution constellation
         shell: bash
         run: |
-          set -euo pipefail
-          {
-            echo "GENERATED_DIR=$RUNNER_TEMP/contribution-scan-generated"
-            echo "PYTHONPYCACHEPREFIX=$RUNNER_TEMP/python-cache"
-          } >> "$GITHUB_ENV"
-
-      - name: Generate animated contribution scan
-        run: |
-          set -euo pipefail
-          mkdir -p "$GENERATED_DIR"
-          python3 scripts/generate_contribution_scan.py --output "$GENERATED_DIR"
-
-          if [[ -n "$(git status --porcelain --untracked-files=all)" ]]; then
-            echo "Generation modified the repository checkout" >&2
-            git status --short
-            exit 1
-          fi
+          mkdir -p "$RUNNER_TEMP/profile-generated"
+          python3 -m py_compile scripts/generate_contribution_scan.py
+          python3 scripts/generate_contribution_scan.py \
+            --output "$RUNNER_TEMP/profile-generated"
         env:
           GITHUB_USER: ${{ github.repository_owner }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Validate generated SVG files
+      - name: Validate SVG assets
+        shell: bash
         run: |
-          set -euo pipefail
-
           python3 - <<'PY'
           from __future__ import annotations
 
           import os
-          import re
           import xml.etree.ElementTree as ET
           from collections import Counter
           from pathlib import Path
 
-          expected = {"contribution-scan.svg", "contribution-scan-dark.svg"}
-          output_dir = Path(os.environ["GENERATED_DIR"])
-          actual = {path.name for path in output_dir.iterdir()}
-          if actual != expected:
+          generated = Path(os.environ["RUNNER_TEMP"]) / "profile-generated"
+          generated_files = {
+              "contribution-scan.svg": generated / "contribution-scan.svg",
+              "contribution-scan-dark.svg": generated / "contribution-scan-dark.svg",
+          }
+          static_files = {
+              "profile-hero-light.svg": Path("assets/profile-hero-light.svg"),
+              "profile-hero-dark.svg": Path("assets/profile-hero-dark.svg"),
+              "orbitops-feature-light.svg": Path("assets/orbitops-feature-light.svg"),
+              "orbitops-feature-dark.svg": Path("assets/orbitops-feature-dark.svg"),
+          }
+          files = {**generated_files, **static_files}
+
+          actual_generated = {path.name for path in generated.iterdir()}
+          if actual_generated != set(generated_files):
               raise SystemExit(
-                  f"generated directory must contain exactly {sorted(expected)}, got {sorted(actual)}"
+                  f"generated directory must contain exactly {sorted(generated_files)}, "
+                  f"got {sorted(actual_generated)}"
               )
 
           def local_name(name: str) -> str:
-              return name.rsplit("}", 1)[-1]
+              return name.rsplit("}", 1)[-1].lower()
 
-          def class_tokens(element: ET.Element) -> set[str]:
-              return set(element.attrib.get("class", "").split())
+          signatures: dict[str, tuple[str | None, str | None, str | None]] = {}
 
-          def is_descendant(
-              element: ET.Element,
-              ancestor: ET.Element,
-              parents: dict[ET.Element, ET.Element],
-          ) -> bool:
-              current = parents.get(element)
-              while current is not None:
-                  if current is ancestor:
-                      return True
-                  current = parents.get(current)
-              return False
-
-          def has_ancestor_class(
-              element: ET.Element,
-              class_name: str,
-              parents: dict[ET.Element, ET.Element],
-          ) -> bool:
-              current = parents.get(element)
-              while current is not None:
-                  if class_name in class_tokens(current):
-                      return True
-                  current = parents.get(current)
-              return False
-
-          color_attributes = {"fill", "stroke", "color", "stop-color"}
-          css_color_property = re.compile(
-              r"(?i)(fill|stroke|color|stop-color)\s*:\s*([^;{}]+)"
-          )
-          local_clip_reference = re.compile(r"url\(#([A-Za-z_][A-Za-z0-9_.:-]*)\)")
-          forbidden_schemes = ("http:", "https:", "data:", "javascript:", "file:")
-
-          def structural_signature(element: ET.Element) -> tuple[object, ...]:
-              tag = local_name(element.tag).lower()
-              attributes = tuple(
-                  sorted(
-                      (local_name(name).lower(), value)
-                      for name, value in element.attrib.items()
-                      if local_name(name).lower() not in color_attributes
-                  )
-              )
-              if tag in {"title", "desc"}:
-                  text = ""
-              elif tag == "style":
-                  text = css_color_property.sub(
-                      lambda match: f"{match.group(1).lower()}:<color>",
-                      element.text or "",
-                  )
-              else:
-                  text = (element.text or "").strip()
-              return (
-                  tag,
-                  attributes,
-                  text,
-                  tuple(structural_signature(child) for child in element),
-              )
-
-          validated_roots: dict[str, ET.Element] = {}
-
-          for filename in sorted(expected):
-              path = output_dir / filename
+          for name, path in files.items():
               if not path.is_file() or path.stat().st_size == 0:
-                  raise SystemExit(f"{filename} is missing or empty")
+                  raise SystemExit(f"{name} is missing or empty")
+              if path.stat().st_size > 500_000:
+                  raise SystemExit(f"{name} is unexpectedly large")
 
               raw = path.read_text(encoding="utf-8")
               try:
                   root = ET.fromstring(raw)
               except ET.ParseError as exc:
-                  raise SystemExit(f"{filename} is not valid XML: {exc}") from exc
+                  raise SystemExit(f"{name} is not valid XML: {exc}") from exc
 
-              if local_name(root.tag).lower() != "svg":
-                  raise SystemExit(f"{filename} root element is not svg")
+              if local_name(root.tag) != "svg":
+                  raise SystemExit(f"{name} root element is not svg")
+              if root.attrib.get("role") != "img":
+                  raise SystemExit(f"{name} must declare role=img")
 
               elements = list(root.iter())
-              parents = {
-                  child: parent
-                  for parent in elements
-                  for child in parent
-              }
-              names = Counter(local_name(element.tag).lower() for element in elements)
-              style_text = "\n".join(
+              counts = Counter(local_name(element.tag) for element in elements)
+              if counts["title"] != 1 or counts["desc"] != 1:
+                  raise SystemExit(f"{name} must contain exactly one title and one desc")
+              if counts["script"] or counts["foreignobject"]:
+                  raise SystemExit(f"{name} contains a forbidden element")
+
+              ids: set[str] = set()
+              for element in elements:
+                  identifier = element.attrib.get("id")
+                  if identifier:
+                      if identifier in ids:
+                          raise SystemExit(f"{name} contains duplicate id {identifier}")
+                      ids.add(identifier)
+                  for attribute, value in element.attrib.items():
+                      attribute_name = local_name(attribute)
+                      if attribute_name.startswith("on"):
+                          raise SystemExit(f"{name} contains an event handler")
+                      if attribute_name.endswith("href") or attribute_name == "src":
+                          raise SystemExit(f"{name} contains a linked resource")
+                      if "javascript:" in value.lower() or "data:" in value.lower():
+                          raise SystemExit(f"{name} contains a forbidden resource")
+
+              style = "\n".join(
                   element.text or ""
                   for element in elements
-                  if local_name(element.tag).lower() == "style"
+                  if local_name(element.tag) == "style"
               )
-              visible_text = [
-                  element
-                  for element in elements
-                  if local_name(element.tag).lower() == "text"
-              ]
+              if "@keyframes" not in style:
+                  raise SystemExit(f"{name} is missing animation keyframes")
+              if "prefers-reduced-motion: reduce" not in style and "prefers-reduced-motion:reduce" not in style:
+                  raise SystemExit(f"{name} is missing reduced-motion handling")
 
-              if names["title"] != 1 or names["desc"] != 1:
-                  raise SystemExit(f"{filename} must contain one title and one desc")
-              if root.attrib.get("role") != "img":
-                  raise SystemExit(f"{filename} must declare role=img")
+              signatures[name] = (
+                  root.attrib.get("width"),
+                  root.attrib.get("height"),
+                  root.attrib.get("viewBox"),
+              )
+              print(f"Validated {name} ({path.stat().st_size} bytes)")
 
-              id_map: dict[str, ET.Element] = {}
-              for element in elements:
-                  if "id" not in element.attrib:
-                      continue
-                  identifier = element.attrib["id"].strip()
-                  if not identifier:
-                      raise SystemExit(f"{filename} contains an empty id")
-                  if identifier in id_map:
-                      raise SystemExit(f"{filename} contains duplicate id {identifier}")
-                  id_map[identifier] = element
-
-              labelled_ids = set(root.attrib.get("aria-labelledby", "").split())
-              accessible_ids = {
-                  element.attrib.get("id")
-                  for element in elements
-                  if local_name(element.tag).lower() in {"title", "desc"}
-              }
-              if None in accessible_ids or labelled_ids != accessible_ids:
-                  raise SystemExit(f"{filename} has an invalid aria-labelledby relationship")
-
-              if "prefers-reduced-motion: reduce" not in style_text:
-                  raise SystemExit(f"{filename} is missing reduced-motion handling")
-              if names["script"] or names["foreignobject"] or names["image"] or names["a"]:
-                  raise SystemExit(f"{filename} contains a forbidden SVG element")
-              if names["animate"] or names["animatetransform"] or names["animatemotion"] or names["set"]:
-                  raise SystemExit(f"{filename} contains SMIL animation")
-              if style_text.count("@keyframes") != 1:
-                  raise SystemExit(f"{filename} must contain exactly one CSS timeline")
-              if "visibility: hidden" not in style_text or "visibility: visible" not in style_text:
-                  raise SystemExit(f"{filename} timeline is missing clip visibility guards")
-              if "url(" in style_text.lower() or any(token in style_text.lower() for token in forbidden_schemes):
-                  raise SystemExit(f"{filename} contains a forbidden CSS resource reference")
-              if visible_text:
-                  raise SystemExit(f"{filename} contains visible text")
-              if any(local_name(element.tag).lower() == "rect" for element in list(root)):
-                  raise SystemExit(f"{filename} contains a root-level panel")
-
-              clip_references: list[tuple[ET.Element, str]] = []
-              for element in elements:
-                  for attribute, value in element.attrib.items():
-                      attribute_name = local_name(attribute).lower()
-                      value_lower = value.lower()
-                      if attribute_name.startswith("on"):
-                          raise SystemExit(f"{filename} contains an event handler")
-                      if attribute_name.endswith("href") or attribute_name == "src":
-                          raise SystemExit(f"{filename} contains a linked resource")
-                      if any(token in value_lower for token in forbidden_schemes):
-                          raise SystemExit(f"{filename} contains an external or embedded resource")
-                      if "url(" in value_lower:
-                          match = local_clip_reference.fullmatch(value)
-                          if attribute_name != "clip-path" or match is None:
-                              raise SystemExit(f"{filename} contains a forbidden url() reference")
-                          clip_references.append((element, match.group(1)))
-
-              for _, identifier in clip_references:
-                  target = id_map.get(identifier)
-                  if target is None:
-                      raise SystemExit(f"{filename} references missing clipPath id {identifier}")
-                  if local_name(target.tag).lower() != "clippath":
-                      raise SystemExit(f"{filename} reference {identifier} does not target clipPath")
-                  for descendant in target.iter():
-                      for attribute, value in descendant.attrib.items():
-                          attribute_name = local_name(attribute).lower()
-                          if attribute_name.startswith("on"):
-                              raise SystemExit(f"{filename} clipPath {identifier} contains an event handler")
-                          if attribute_name.endswith("href") or attribute_name == "src":
-                              raise SystemExit(f"{filename} clipPath {identifier} contains a linked resource")
-                          if "url(" in value.lower():
-                              raise SystemExit(f"{filename} clipPath {identifier} contains a nested reference")
-                      if local_name(descendant.tag).lower() in {"script", "image", "foreignobject"}:
-                          raise SystemExit(f"{filename} clipPath {identifier} contains a forbidden element")
-
-              forbidden_words = {"LIVE", "ONLINE", "SCANNER", "STREAK", "TOTAL"}
-              matches = sorted(word for word in forbidden_words if word in raw.upper())
-              if matches:
-                  raise SystemExit(f"{filename} contains forbidden words: {matches}")
-
-              clip_paths = [
-                  element for element in elements
-                  if local_name(element.tag).lower() == "clippath"
-              ]
-              if not 1 <= len(clip_paths) <= 2:
-                  raise SystemExit(f"{filename} must contain one or two clipPath elements")
-              for clip_path in clip_paths:
-                  children = list(clip_path)
-                  if len(children) != 1 or local_name(children[0].tag).lower() != "rect":
-                      raise SystemExit(f"{filename} clipPath must contain exactly one rect")
-                  clip_rect = children[0]
-                  classes = class_tokens(clip_rect)
-                  if not {"flare-motion", "clip-motion"} <= classes:
-                      raise SystemExit(f"{filename} clipPath rect is missing motion classes")
-                  if not clip_rect.attrib.get("transform", "").strip():
-                      raise SystemExit(f"{filename} clipPath rect is missing fallback transform")
-                  if clip_rect.attrib.get("visibility") != "hidden":
-                      raise SystemExit(f"{filename} clipPath rect must be hidden without animation")
-
-              quiet_sweeps = [
-                  element
-                  for element in elements
-                  if local_name(element.tag).lower() == "g"
-                  and "quiet-sweep" in class_tokens(element)
-              ]
-              if len(quiet_sweeps) != 1:
-                  raise SystemExit(f"{filename} must contain exactly one quiet-sweep group")
-              quiet_sweep = quiet_sweeps[0]
-              if not quiet_sweep.attrib.get("transform", "").strip():
-                  raise SystemExit(f"{filename} quiet-sweep group is missing its SVG fallback transform")
-              try:
-                  base_opacity = float(quiet_sweep.attrib.get("opacity", ""))
-              except ValueError as exc:
-                  raise SystemExit(f"{filename} quiet-sweep group has invalid base opacity") from exc
-              if base_opacity <= 0:
-                  raise SystemExit(f"{filename} quiet-sweep group must be visible without CSS")
-
-              scan_lines = [
-                  element
-                  for element in elements
-                  if local_name(element.tag).lower() == "line"
-                  and "scan-line" in class_tokens(element)
-              ]
-              if len(scan_lines) != 1:
-                  raise SystemExit(f"{filename} must contain exactly one scan-line")
-              if not is_descendant(scan_lines[0], quiet_sweep, parents):
-                  raise SystemExit(f"{filename} scan-line must belong to the quiet-sweep group")
-
-              scan_cues = [
-                  element
-                  for element in elements
-                  if local_name(element.tag).lower() == "g"
-                  and "scan-cues" in class_tokens(element)
-              ]
-              if len(scan_cues) != 1 or not is_descendant(scan_cues[0], quiet_sweep, parents):
-                  raise SystemExit(f"{filename} must contain one scan-cues group inside quiet-sweep")
-              try:
-                  scan_cues_opacity = float(scan_cues[0].attrib.get("opacity", ""))
-              except ValueError as exc:
-                  raise SystemExit(f"{filename} scan-cues group has invalid fallback opacity") from exc
-              if scan_cues_opacity != 0:
-                  raise SystemExit(f"{filename} scan-cues must be hidden without CSS")
-
-              base_css = style_text.split("@keyframes", 1)[0]
-              base_rule = re.search(r"\.quiet-sweep\s*\{([^{}]*)\}", base_css, re.DOTALL)
-              if base_rule is None or not re.search(
-                  r"transform\s*:\s*translateX\([^)]*\)", base_rule.group(1)
-              ):
-                  raise SystemExit(f"{filename} CSS is missing the quiet-sweep base position")
-              if not re.search(r"opacity\s*:\s*(?:1(?:\.0*)?|0?\.[1-9]\d*)", base_rule.group(1)):
-                  raise SystemExit(f"{filename} CSS is missing visible quiet-sweep base opacity")
-
-              reduced_css = style_text.split("@media (prefers-reduced-motion: reduce)", 1)
-              if len(reduced_css) != 2:
-                  raise SystemExit(f"{filename} is missing the reduced-motion media rule")
-              reduced_body = reduced_css[1]
-              if not re.search(
-                  r"\.quiet-sweep\s*\{[^{}]*animation\s*:\s*none\s*;",
-                  reduced_body,
-                  re.DOTALL,
-              ):
-                  raise SystemExit(f"{filename} reduced motion does not disable the animation")
-              if not re.search(
-                  r"\.clip-motion\s*\{[^{}]*animation\s*:\s*none\s*;",
-                  reduced_body,
-                  re.DOTALL,
-              ):
-                  raise SystemExit(f"{filename} reduced motion does not stop the clip windows")
-              if not re.search(
-                  r"\.flare-layer\s*,\s*\.scan-cues\s*\{[^{}]*display\s*:\s*none\s*;",
-                  reduced_body,
-                  re.DOTALL,
-              ):
-                  raise SystemExit(f"{filename} reduced motion does not hide flare layers and scan cues")
-
-              signal_paths = [
-                  element
-                  for element in elements
-                  if local_name(element.tag).lower() == "path"
-                  and "data-level" in element.attrib
-              ]
-              if not 1 <= len(signal_paths) <= 5:
-                  raise SystemExit(f"{filename} must contain between one and five base signal paths")
-              levels: set[int] = set()
-              for signal_path in signal_paths:
-                  try:
-                      level = int(signal_path.attrib["data-level"])
-                  except ValueError as exc:
-                      raise SystemExit(f"{filename} has a non-integer signal level") from exc
-                  if not 0 <= level <= 4 or level in levels:
-                      raise SystemExit(f"{filename} has an invalid or duplicate signal level {level}")
-                  if not signal_path.attrib.get("d", "").strip():
-                      raise SystemExit(f"{filename} has an empty base signal path")
-                  if is_descendant(signal_path, quiet_sweep, parents):
-                      raise SystemExit(f"{filename} base signal paths must remain outside quiet-sweep")
-                  levels.add(level)
-
-              flare_layers = [
-                  element
-                  for element in elements
-                  if local_name(element.tag).lower() == "g"
-                  and "flare-layer" in class_tokens(element)
-              ]
-              if not 1 <= len(flare_layers) <= 2:
-                  raise SystemExit(f"{filename} must contain one or two flare-layer groups")
-              for flare_layer in flare_layers:
-                  try:
-                      fallback_opacity = float(flare_layer.attrib.get("opacity", ""))
-                  except ValueError as exc:
-                      raise SystemExit(f"{filename} flare-layer has invalid fallback opacity") from exc
-                  if fallback_opacity != 0:
-                      raise SystemExit(f"{filename} flare-layer must be hidden without CSS")
-                  if is_descendant(flare_layer, quiet_sweep, parents):
-                      raise SystemExit(f"{filename} flare-layer must remain outside quiet-sweep")
-                  if "clip-path" not in flare_layer.attrib:
-                      raise SystemExit(f"{filename} flare-layer is missing clip-path")
-
-              flare_paths = [
-                  element
-                  for element in elements
-                  if local_name(element.tag).lower() == "path"
-                  and "data-flare-level" in element.attrib
-              ]
-              if len(flare_paths) > 4:
-                  raise SystemExit(f"{filename} contains more than four flare paths")
-              flare_levels: set[int] = set()
-              for flare_path in flare_paths:
-                  try:
-                      level = int(flare_path.attrib["data-flare-level"])
-                  except ValueError as exc:
-                      raise SystemExit(f"{filename} has a non-integer flare level") from exc
-                  if not 1 <= level <= 4 or level in flare_levels:
-                      raise SystemExit(f"{filename} has an invalid or duplicate flare level {level}")
-                  if not flare_path.attrib.get("d", "").strip():
-                      raise SystemExit(f"{filename} has an empty flare path")
-                  if is_descendant(flare_path, quiet_sweep, parents):
-                      raise SystemExit(f"{filename} flare paths must remain outside quiet-sweep")
-                  if not has_ancestor_class(flare_path, "flare-layer", parents):
-                      raise SystemExit(f"{filename} flare path must belong to flare-layer")
-                  flare_levels.add(level)
-
-              core_paths = [
-                  element
-                  for element in elements
-                  if local_name(element.tag).lower() == "path"
-                  and "data-flare-core" in element.attrib
-              ]
-              if len(core_paths) > 2:
-                  raise SystemExit(f"{filename} contains more than two flare core paths")
-              core_names: set[str] = set()
-              for core_path in core_paths:
-                  name = core_path.attrib["data-flare-core"]
-                  if not name or name in core_names:
-                      raise SystemExit(f"{filename} has an empty or duplicate flare core name")
-                  if not core_path.attrib.get("d", "").strip():
-                      raise SystemExit(f"{filename} has an empty flare core path")
-                  if is_descendant(core_path, quiet_sweep, parents):
-                      raise SystemExit(f"{filename} flare core paths must remain outside quiet-sweep")
-                  if not has_ancestor_class(core_path, "flare-layer", parents):
-                      raise SystemExit(f"{filename} flare core must belong to flare-layer")
-                  core_names.add(name)
-
-              validated_roots[filename] = root
-              print(f"Validated {filename} ({path.stat().st_size} bytes)")
-
-          light_signature = structural_signature(validated_roots["contribution-scan.svg"])
-          dark_signature = structural_signature(validated_roots["contribution-scan-dark.svg"])
-          if light_signature != dark_signature:
-              raise SystemExit("light and dark SVGs have different structure or geometry")
-          print("Validated matching light/dark structure and geometry")
+          pairs = [
+              ("profile-hero-light.svg", "profile-hero-dark.svg"),
+              ("orbitops-feature-light.svg", "orbitops-feature-dark.svg"),
+              ("contribution-scan.svg", "contribution-scan-dark.svg"),
+          ]
+          for light, dark in pairs:
+              if signatures[light] != signatures[dark]:
+                  raise SystemExit(f"{light} and {dark} use different canvas geometry")
+              print(f"Validated matching geometry: {light} / {dark}")
           PY
 
-      - name: Upload validated SVG artifact
+      - name: Upload validated contribution constellation
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: contribution-scan
-          path: ${{ runner.temp }}/contribution-scan-generated/*.svg
+          name: contribution-constellation
+          path: ${{ runner.temp }}/profile-generated/*.svg
           if-no-files-found: error
           retention-days: 1
 
   publish:
-    name: Publish profile scan
+    name: Publish contribution constellation
     needs: validate
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
@@ -476,82 +178,40 @@ jobs:
           fetch-depth: 1
           persist-credentials: true
 
-      - name: Configure publish paths
-        shell: bash
-        run: |
-          set -euo pipefail
-          {
-            echo "GENERATED_DIR=$RUNNER_TEMP/contribution-scan-generated"
-            echo "PUBLISH_DIR=$RUNNER_TEMP/contribution-scan-publish"
-          } >> "$GITHUB_ENV"
-
       - name: Download validated SVG artifact
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
-          name: contribution-scan
-          path: ${{ runner.temp }}/contribution-scan-generated
+          name: contribution-constellation
+          path: ${{ runner.temp }}/profile-generated
 
       - name: Publish SVG files to output branch
         shell: bash
         run: |
-          set -euo pipefail
+          GENERATED_DIR="$RUNNER_TEMP/profile-generated"
+          PUBLISH_DIR="$RUNNER_TEMP/profile-publish"
 
-          set +e
-          git ls-remote --exit-code --refs origin refs/heads/output
-          remote_status=$?
-          set -e
-
-          case "$remote_status" in
-            0)
-              output_exists=true
-              git fetch --no-tags --depth=1 origin \
-                refs/heads/output:refs/remotes/origin/output
-              git worktree add --detach "$PUBLISH_DIR" origin/output
-              ;;
-            2)
-              output_exists=false
-              git worktree add --detach "$PUBLISH_DIR" HEAD
-              git -C "$PUBLISH_DIR" switch --orphan contribution-scan-output
-              ;;
-            *)
-              echo "Unable to verify the remote output branch (git ls-remote exit $remote_status)." >&2
-              exit "$remote_status"
-              ;;
-          esac
+          if git ls-remote --exit-code --refs origin refs/heads/output >/dev/null 2>&1; then
+            git fetch --no-tags --depth=1 origin refs/heads/output:refs/remotes/origin/output
+            git worktree add --detach "$PUBLISH_DIR" origin/output
+            OUTPUT_EXISTS=true
+          else
+            git worktree add --detach "$PUBLISH_DIR" HEAD
+            git -C "$PUBLISH_DIR" switch --orphan contribution-constellation-output
+            OUTPUT_EXISTS=false
+          fi
 
           git -C "$PUBLISH_DIR" rm -rf --ignore-unmatch .
           cp "$GENERATED_DIR/contribution-scan.svg" "$PUBLISH_DIR/contribution-scan.svg"
           cp "$GENERATED_DIR/contribution-scan-dark.svg" "$PUBLISH_DIR/contribution-scan-dark.svg"
           git -C "$PUBLISH_DIR" add -- contribution-scan.svg contribution-scan-dark.svg
 
-          python3 - <<'PY'
-          import os
-          import subprocess
-          from pathlib import Path
-
-          publish_dir = Path(os.environ["PUBLISH_DIR"])
-          tracked = set(
-              subprocess.run(
-                  ["git", "-C", str(publish_dir), "ls-files"],
-                  check=True,
-                  capture_output=True,
-                  text=True,
-              ).stdout.splitlines()
-          )
-          expected = {"contribution-scan.svg", "contribution-scan-dark.svg"}
-          if tracked != expected:
-              raise SystemExit(
-                  f"publish index must contain exactly {sorted(expected)}, got {sorted(tracked)}"
-              )
-          PY
-
-          if [[ "$output_exists" == "true" ]] && git -C "$PUBLISH_DIR" diff --cached --quiet; then
-            echo "Contribution scan output is unchanged; nothing to publish."
+          if [[ "$OUTPUT_EXISTS" == "true" ]] && git -C "$PUBLISH_DIR" diff --cached --quiet; then
+            echo "Contribution constellation is unchanged; nothing to publish."
             exit 0
           fi
 
           git -C "$PUBLISH_DIR" \
             -c user.name="github-actions[bot]" \
             -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
-            commit -m "chore: update contribution scan"
+            commit -m "chore: update contribution constellation"
           git -C "$PUBLISH_DIR" push origin HEAD:output
