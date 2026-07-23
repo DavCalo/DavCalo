@@ -17,24 +17,7 @@ Computer Engineering student building reliable software for embedded platforms, 
 
 </div>
 
-## Contribution telemetry
-
-<p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/DavCalo/DavCalo/output/contribution-scan-dark.svg" />
-    <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/DavCalo/DavCalo/output/contribution-scan.svg" />
-    <img src="https://raw.githubusercontent.com/DavCalo/DavCalo/output/contribution-scan.svg" width="100%" alt="Animated 26-week GitHub contribution telemetry pass" />
-  </picture>
-</p>
-
-<p align="center">
-  <sub>
-    A rolling 26-week activity window generated with
-    <a href="scripts/generate_contribution_scan.py">Python</a>, GitHub GraphQL, SVG, and GitHub Actions.
-  </sub>
-</p>
-
-## Flagship project
+## Featured project
 
 ### [OrbitOps](https://github.com/DavCalo/OrbitOps)
 
@@ -50,7 +33,7 @@ C++ on-board simulator → deterministic UDP link → Python ground station
 
 `C++17` · `Python` · `UDP` · `CMake` · `TOML` · `GitHub Actions`
 
-[Explore the repository](https://github.com/DavCalo/OrbitOps) · [Read the architecture](https://github.com/DavCalo/OrbitOps/blob/main/docs/architecture.md) · [Run the flagship demo](https://github.com/DavCalo/OrbitOps#quick-start)
+[Explore the repository](https://github.com/DavCalo/OrbitOps) · [Read the architecture](https://github.com/DavCalo/OrbitOps/blob/main/docs/architecture.md) · [Run the demo](https://github.com/DavCalo/OrbitOps#quick-start)
 
 ## Currently working on
 
@@ -86,7 +69,7 @@ C++ on-board simulator → deterministic UDP link → Python ground station
       <strong>Software engineering</strong><br /><br />
       <code>Python</code> <code>Java</code><br />
       Testing<br />
-      API design<br />
+      Packaging<br />
       GitHub Actions
     </td>
     <td width="33%" valign="top">
@@ -98,6 +81,23 @@ C++ on-board simulator → deterministic UDP link → Python ground station
     </td>
   </tr>
 </table>
+
+## Contribution telemetry
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/DavCalo/DavCalo/output/contribution-scan-dark.svg" />
+    <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/DavCalo/DavCalo/output/contribution-scan.svg" />
+    <img src="https://raw.githubusercontent.com/DavCalo/DavCalo/output/contribution-scan.svg" width="100%" alt="Animated 26-week GitHub contribution telemetry pass" />
+  </picture>
+</p>
+
+<p align="center">
+  <sub>
+    A rolling 26-week activity window generated with
+    <a href="scripts/generate_contribution_scan.py">Python</a>, GitHub GraphQL, SVG, and GitHub Actions.
+  </sub>
+</p>
 
 ---
 
