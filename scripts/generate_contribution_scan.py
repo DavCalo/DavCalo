@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
-"""Generate an animated recent GitHub contribution telemetry scan as SVG.
+"""Generate an animated GitHub contribution telemetry pass as accessible SVG.
 
-The horizontal axis is time (weeks), the vertical axis is weekday, and signal
-size/brightness represents contribution intensity. The latest 26 weeks are
-expanded across a compact canvas. A CubeSat performs one left-to-right pass,
-briefly turning active days into larger circles or technical four-point signal
-flares. A directional acquisition window leaves a brief visual echo behind the
-satellite, while the complete contribution matrix remains continuously visible.
+The latest 26 contribution weeks are rendered as a compact telemetry matrix.
+A small CubeSat performs a short pass over the data, briefly amplifying active
+signals before coming to rest near a static ground station. The animation has a
+long quiet interval, light and dark variants, and a reduced-motion fallback.
 
 Only Python's standard library is required.
 """
@@ -46,26 +44,30 @@ query ContributionCalendar($login: String!) {
 }
 """
 
-WIDTH = 720
-HEIGHT = 192
-GRID_X0 = 48.0
-GRID_X1 = 672.0
-GRID_Y0 = 72.0
-GRID_ROW_GAP = 15.0
+WIDTH = 920
+HEIGHT = 236
+GRID_X0 = 68.0
+GRID_X1 = 724.0
+GRID_Y0 = 114.0
+GRID_ROW_GAP = 13.5
 RECENT_WEEK_LIMIT = 26
-SATELLITE_Y = 38.0
-SATELLITE_SCALE = 1.05
-SCAN_DURATION = 21.0
+
+ORBIT_Y = 54.0
+SATELLITE_SCALE = 0.78
+SCAN_DURATION = 30.0
 TRAVEL_START = GRID_X0
 TRAVEL_END = GRID_X1
-FALLBACK_X = GRID_X1 - 4.0
-CLIP_TOP = 65.0
-CLIP_BOTTOM = 168.0
+FALLBACK_X = GRID_X1
+
+CLIP_TOP = 102.0
+CLIP_BOTTOM = 207.0
 FLARE_MAIN_X = -25.0
-FLARE_MAIN_WIDTH = 34.0
-FLARE_CORE_X = -4.5
-FLARE_CORE_WIDTH = 9.0
-MARKER_Y = 54.0
+FLARE_MAIN_WIDTH = 50.0
+FLARE_CORE_X = -5.0
+FLARE_CORE_WIDTH = 10.0
+
+STATION_X = 840.0
+STATION_Y = 184.0
 
 
 @dataclass(frozen=True)
@@ -77,7 +79,7 @@ class Day:
 
 @dataclass(frozen=True)
 class Calendar:
-    total: int
+    contributions: int
     weeks: list[list[Day]]
     demo: bool = False
 
@@ -91,31 +93,38 @@ class Geometry:
     row_gap: float = GRID_ROW_GAP
 
 
-PALETTES = {
+PALETTES: dict[str, dict[str, object]] = {
     "light": {
-        "zero": "#B8C4D1",
-        "levels": ["#5A8FA8", "#287FA5", "#176B91", "#4F46E5"],
-        "flare": ["#4A91AC", "#269AC0", "#2F83B5", "#7277EE"],
-        "core_mid": "#D5F0F7",
-        "core_high": "#E0E7FF",
-        "marker": "#94A3B8",
-        "scan": "#287FA5",
+        "zero": "#C7D0DB",
+        "levels": ["#7BA7BA", "#3188A8", "#16709A", "#4F46E5"],
+        "flare": ["#63A7BD", "#2BA6C8", "#3B91C3", "#6D73EF"],
+        "core_mid": "#E2F5FA",
+        "core_high": "#EEF2FF",
+        "track": "#94A3B8",
+        "lane": "#CBD5E1",
+        "scan": "#1683AD",
+        "beam": "#38BDF8",
         "body": "#F8FAFC",
         "body_edge": "#334155",
-        "solar": "#287FA5",
-        "solar_edge": "#D9F0F7",
+        "solar": "#237FA5",
+        "solar_edge": "#D7F0F8",
         "solar_line": "#BAE6FD",
         "core": "#4F46E5",
         "detail": "#64748B",
+        "station": "#475569",
+        "station_fill": "#E2E8F0",
+        "pulse": "#0EA5E9",
     },
     "dark": {
-        "zero": "#3F4D61",
-        "levels": ["#3C7A91", "#2F9CC2", "#55A8C5", "#A5B4FC"],
-        "flare": ["#5AA5BA", "#61BED8", "#7DD3FC", "#C7D2FE"],
-        "core_mid": "#D9F2F8",
-        "core_high": "#E0E7FF",
-        "marker": "#64748B",
+        "zero": "#3B485B",
+        "levels": ["#3D7D92", "#2B9BBE", "#65B8D2", "#A5B4FC"],
+        "flare": ["#5DA8BC", "#64C7DF", "#7DD3FC", "#C7D2FE"],
+        "core_mid": "#DCF7FC",
+        "core_high": "#EEF2FF",
+        "track": "#64748B",
+        "lane": "#334155",
         "scan": "#7DD3FC",
+        "beam": "#38BDF8",
         "body": "#E2E8F0",
         "body_edge": "#94A3B8",
         "solar": "#2F9CC2",
@@ -123,6 +132,9 @@ PALETTES = {
         "solar_line": "#BAE6FD",
         "core": "#A5B4FC",
         "detail": "#94A3B8",
+        "station": "#94A3B8",
+        "station_fill": "#334155",
+        "pulse": "#7DD3FC",
     },
 }
 
@@ -135,7 +147,7 @@ def fetch_calendar(login: str, token: str) -> Calendar:
         headers={
             "Authorization": f"bearer {token}",
             "Content-Type": "application/json",
-            "User-Agent": "contribution-orbit-generator",
+            "User-Agent": "contribution-telemetry-generator",
         },
         method="POST",
     )
@@ -155,37 +167,39 @@ def fetch_calendar(login: str, token: str) -> Calendar:
         raise RuntimeError(f"GitHub user '{login}' was not found")
 
     raw = user["contributionsCollection"]["contributionCalendar"]
-    weeks: list[list[Day]] = []
-    for raw_week in raw["weeks"]:
-        weeks.append([
+    weeks = [
+        [
             Day(
                 date=item["date"],
                 weekday=int(item["weekday"]),
                 count=int(item["contributionCount"]),
             )
             for item in raw_week["contributionDays"]
-        ])
-    return Calendar(total=int(raw["totalContributions"]), weeks=weeks)
+        ]
+        for raw_week in raw["weeks"]
+    ]
+    return Calendar(contributions=int(raw["totalContributions"]), weeks=weeks)
 
 
 def demo_calendar(reference_date: date | None = None) -> Calendar:
-    rng = random.Random(20260710)
+    """Return deterministic sample data suitable for local previews."""
+    rng = random.Random(20260723)
     end = reference_date or date.today()
     start = end - timedelta(days=365)
     start -= timedelta(days=(start.weekday() + 1) % 7)
     day_count = (end - start).days + 1
+
     counts: list[int] = []
     for index in range(day_count):
-        # Seeded counts are repeatable for a fixed reference date.
-        phase = 0.13 + 0.07 * (1 + math.sin(index / 25.0))
-        burst = 0.12 if 0.39 * day_count < index < 0.62 * day_count else 0.0
+        phase = 0.16 + 0.06 * (1 + math.sin(index / 23.0))
+        burst = 0.14 if 0.48 * day_count < index < 0.70 * day_count else 0.0
         if rng.random() >= phase + burst:
             counts.append(0)
             continue
-        amount = 1 + int(rng.expovariate(0.42))
-        if rng.random() < 0.07:
-            amount += rng.randint(6, 16)
-        counts.append(min(amount, 30))
+        amount = 1 + int(rng.expovariate(0.45))
+        if rng.random() < 0.08:
+            amount += rng.randint(5, 15)
+        counts.append(min(amount, 28))
 
     weeks: list[list[Day]] = []
     for index, count in enumerate(counts):
@@ -194,16 +208,15 @@ def demo_calendar(reference_date: date | None = None) -> Calendar:
         if weekday == 0 or not weeks:
             weeks.append([])
         weeks[-1].append(Day(current.isoformat(), weekday, count))
-    return Calendar(total=sum(counts), weeks=weeks, demo=True)
+    return Calendar(contributions=sum(counts), weeks=weeks, demo=True)
 
 
 def recent_calendar(calendar: Calendar, week_limit: int = RECENT_WEEK_LIMIT) -> Calendar:
-    """Return a new calendar containing the latest chronological weeks."""
     if week_limit <= 0:
         raise ValueError("week_limit must be positive")
-    selected_weeks = [list(week) for week in calendar.weeks[-week_limit:]]
-    total = sum(day.count for week in selected_weeks for day in week)
-    return Calendar(total=total, weeks=selected_weeks, demo=calendar.demo)
+    selected = [list(week) for week in calendar.weeks[-week_limit:]]
+    count = sum(day.count for week in selected for day in week)
+    return Calendar(contributions=count, weeks=selected, demo=calendar.demo)
 
 
 def flatten_days(calendar: Calendar) -> list[Day]:
@@ -213,7 +226,6 @@ def flatten_days(calendar: Calendar) -> list[Day]:
 def level_for(count: int, max_count: int) -> int:
     if count <= 0 or max_count <= 0:
         return 0
-    # Log scaling keeps ordinary activity distinguishable when one day is extreme.
     ratio = math.log1p(count) / math.log1p(max_count)
     return min(4, max(1, math.ceil(ratio * 4)))
 
@@ -244,17 +256,13 @@ def circle_subpath(x: float, y: float, radius: float) -> str:
     )
 
 
-def star_subpath(x: float, y: float, outer_radius: float, inner_radius: float) -> str:
-    """Return a deterministic, symmetric four-point signal flare."""
-    points: list[tuple[float, float]] = []
-    for index in range(8):
-        angle = -math.pi / 2 + index * math.pi / 4
-        radius = outer_radius if index % 2 == 0 else inner_radius
-        points.append((x + math.cos(angle) * radius, y + math.sin(angle) * radius))
-    commands = [f"M{points[0][0]:.2f},{points[0][1]:.2f}"]
-    commands.extend(f"L{px:.2f},{py:.2f}" for px, py in points[1:])
-    commands.append("Z")
-    return "".join(commands)
+def diamond_subpath(x: float, y: float, radius: float) -> str:
+    return (
+        f"M{x:.2f},{y - radius:.2f}"
+        f"L{x + radius:.2f},{y:.2f}"
+        f"L{x:.2f},{y + radius:.2f}"
+        f"L{x - radius:.2f},{y:.2f}Z"
+    )
 
 
 def build_signal_paths(
@@ -262,9 +270,9 @@ def build_signal_paths(
     geometry: Geometry,
 ) -> tuple[dict[int, str], dict[int, str], dict[str, str]]:
     max_count = max((day.count for day in flatten_days(calendar)), default=0)
-    base_radii = [1.70, 2.30, 2.90, 3.55, 4.20]
-    flare_radii = {1: 2.88, 2: 4.02}
-    star_sizes = {3: (7.62, 2.64), 4: (9.12, 3.02)}
+    base_radii = [1.55, 2.05, 2.55, 3.10, 3.65]
+    flare_radii = {1: 2.80, 2: 3.75}
+    diamond_radii = {3: 5.50, 4: 7.00}
 
     base_parts: dict[int, list[str]] = {level: [] for level in range(5)}
     flare_parts: dict[int, list[str]] = {level: [] for level in range(1, 5)}
@@ -280,14 +288,13 @@ def build_signal_paths(
             if level in (1, 2):
                 flare_parts[level].append(circle_subpath(x, y, flare_radii[level]))
             elif level in (3, 4):
-                outer, inner = star_sizes[level]
-                flare_parts[level].append(star_subpath(x, y, outer, inner))
+                flare_parts[level].append(diamond_subpath(x, y, diamond_radii[level]))
 
             if level in (2, 3):
-                core_parts["mid"].append(circle_subpath(x, y, 1.40))
+                core_parts["mid"].append(circle_subpath(x, y, 1.25))
             elif level == 4:
-                core_parts["high"].append(circle_subpath(x, y, 2.05))
-                core_parts["high"].append(star_subpath(x, y, 3.82, 1.02))
+                core_parts["high"].append(circle_subpath(x, y, 1.75))
+                core_parts["high"].append(diamond_subpath(x, y, 2.85))
 
     base = {level: "".join(parts) for level, parts in base_parts.items() if parts}
     flare = {level: "".join(parts) for level, parts in flare_parts.items() if parts}
@@ -295,12 +302,8 @@ def build_signal_paths(
     return base, flare, cores
 
 
-def render_base_paths(
-    paths: dict[int, str],
-    palette: dict[str, object],
-) -> str:
-    # Keep inactive days readable while letting recent activity dominate.
-    opacities = [0.62, 0.80, 0.88, 0.96, 1.00]
+def render_base_paths(paths: dict[int, str], palette: dict[str, object]) -> str:
+    opacities = [0.60, 0.78, 0.87, 0.96, 1.00]
     rendered: list[str] = []
     for level, data in paths.items():
         color = palette["zero"] if level == 0 else palette["levels"][level - 1]  # type: ignore[index]
@@ -316,7 +319,7 @@ def render_flare_paths(
     core_paths: dict[str, str],
     palette: dict[str, object],
 ) -> tuple[str, str]:
-    flare_opacities = [0.92, 0.97, 1.00, 1.00]
+    flare_opacities = [0.90, 0.96, 1.00, 1.00]
     flare_rendered: list[str] = []
     for level, data in flare_paths.items():
         color = palette["flare"][level - 1]  # type: ignore[index]
@@ -340,22 +343,33 @@ def render_flare_paths(
 
 
 def render_satellite(palette: dict[str, object]) -> str:
-    return f'''<g class="satellite" transform="translate(0 {SATELLITE_Y:.2f}) scale({SATELLITE_SCALE:.2f})">
-        <path d="M-20 0H-13M13 0H20" fill="none" stroke="{palette['body_edge']}" stroke-width="1.8" stroke-linecap="round"/>
-        <rect x="-36" y="-9" width="16" height="18" rx="2" fill="{palette['solar']}" stroke="{palette['solar_edge']}" stroke-width="1.1"/>
-        <path d="M-30.7-9V9M-25.3-9V9M-36 0H-20" fill="none" stroke="{palette['solar_line']}" stroke-width="0.8" opacity="0.80"/>
-        <rect x="20" y="-9" width="16" height="18" rx="2" fill="{palette['solar']}" stroke="{palette['solar_edge']}" stroke-width="1.1"/>
-        <path d="M25.3-9V9M30.7-9V9M20 0H36" fill="none" stroke="{palette['solar_line']}" stroke-width="0.8" opacity="0.80"/>
-        <rect x="-13" y="-11" width="26" height="22" rx="4.5" fill="{palette['body']}" stroke="{palette['body_edge']}" stroke-width="1.5"/>
-        <path d="M-8-11L-5-15H5L8-11" fill="none" stroke="{palette['body_edge']}" stroke-width="1.3" stroke-linejoin="round"/>
-        <rect x="-10" y="-6" width="4" height="12" rx="1.2" fill="{palette['detail']}" opacity="0.30"/>
-        <rect x="6" y="-6" width="4" height="12" rx="1.2" fill="{palette['detail']}" opacity="0.30"/>
-        <circle cx="0" cy="0" r="4.8" fill="none" stroke="{palette['core']}" stroke-width="1.5"/>
-        <circle cx="0" cy="0" r="2.4" fill="{palette['core']}"/>
-        <path d="M0-15V-22M-6-25Q0-19 6-25" fill="none" stroke="{palette['body_edge']}" stroke-width="1.4" stroke-linecap="round"/>
-        <circle cx="0" cy="-23.2" r="1.6" fill="{palette['core']}"/>
-        <path d="M-6 7H6" fill="none" stroke="{palette['detail']}" stroke-width="1.1" stroke-linecap="round" opacity="0.68"/>
-      </g>'''
+    return f'''<g class="satellite" transform="translate(0 {ORBIT_Y:.2f}) scale({SATELLITE_SCALE:.2f})">
+      <path d="M-18 0H-12M12 0H18" fill="none" stroke="{palette['body_edge']}" stroke-width="1.8" stroke-linecap="round"/>
+      <rect x="-32" y="-8" width="14" height="16" rx="2" fill="{palette['solar']}" stroke="{palette['solar_edge']}" stroke-width="1.1"/>
+      <path d="M-27.3-8V8M-22.7-8V8M-32 0H-18" fill="none" stroke="{palette['solar_line']}" stroke-width="0.8" opacity="0.78"/>
+      <rect x="18" y="-8" width="14" height="16" rx="2" fill="{palette['solar']}" stroke="{palette['solar_edge']}" stroke-width="1.1"/>
+      <path d="M22.7-8V8M27.3-8V8M18 0H32" fill="none" stroke="{palette['solar_line']}" stroke-width="0.8" opacity="0.78"/>
+      <rect x="-12" y="-10" width="24" height="20" rx="4" fill="{palette['body']}" stroke="{palette['body_edge']}" stroke-width="1.5"/>
+      <rect x="-8" y="-5" width="4" height="10" rx="1" fill="{palette['detail']}" opacity="0.28"/>
+      <rect x="4" y="-5" width="4" height="10" rx="1" fill="{palette['detail']}" opacity="0.28"/>
+      <circle cx="0" cy="0" r="4.4" fill="none" stroke="{palette['core']}" stroke-width="1.4"/>
+      <circle cx="0" cy="0" r="2.1" fill="{palette['core']}"/>
+      <path d="M0-10V-17M-5-20Q0-15 5-20" fill="none" stroke="{palette['body_edge']}" stroke-width="1.3" stroke-linecap="round"/>
+      <circle cx="0" cy="-18.7" r="1.4" fill="{palette['core']}"/>
+    </g>'''
+
+
+def render_ground_station(palette: dict[str, object]) -> str:
+    x = STATION_X
+    y = STATION_Y
+    return f'''<g class="ground-station" aria-hidden="true">
+      <path d="M{x - 58:.1f} {y - 97:.1f}Q{x - 20:.1f} {y - 126:.1f} {x + 3:.1f} {y - 82:.1f}" fill="none" stroke="{palette['pulse']}" stroke-width="1.1" opacity="0.22" stroke-dasharray="3 6"/>
+      <path d="M{x - 43:.1f} {y - 76:.1f}Q{x - 13:.1f} {y - 101:.1f} {x + 4:.1f} {y - 68:.1f}" fill="none" stroke="{palette['pulse']}" stroke-width="1.1" opacity="0.34" stroke-dasharray="3 5"/>
+      <path d="M{x - 25:.1f} {y - 55:.1f}Q{x - 7:.1f} {y - 70:.1f} {x + 4:.1f} {y - 50:.1f}" fill="none" stroke="{palette['pulse']}" stroke-width="1.1" opacity="0.50"/>
+      <path d="M{x - 12:.1f} {y - 29:.1f}Q{x + 4:.1f} {y - 45:.1f} {x + 20:.1f} {y - 29:.1f}Q{x + 4:.1f} {y - 10:.1f} {x - 12:.1f} {y - 29:.1f}Z" fill="{palette['station_fill']}" stroke="{palette['station']}" stroke-width="1.6"/>
+      <path d="M{x + 4:.1f} {y - 29:.1f}L{x + 4:.1f} {y - 5:.1f}M{x - 7:.1f} {y + 8:.1f}H{x + 15:.1f}M{x + 4:.1f} {y - 5:.1f}L{x - 7:.1f} {y + 8:.1f}M{x + 4:.1f} {y - 5:.1f}L{x + 15:.1f} {y + 8:.1f}" fill="none" stroke="{palette['station']}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="{x + 4:.1f}" cy="{y - 29:.1f}" r="2.1" fill="{palette['pulse']}"/>
+    </g>'''
 
 
 def calendar_period(calendar: Calendar) -> tuple[str, str]:
@@ -377,18 +391,25 @@ def render_svg(calendar: Calendar, login: str, theme: str) -> str:
     base_markup = render_base_paths(base_paths, palette)
     flare_markup, core_markup = render_flare_paths(flare_paths, core_paths, palette)
 
+    lane_markup = "".join(
+        f'<line x1="{geometry.x0 - 10:.2f}" y1="{y_for_weekday(day, geometry):.2f}" '
+        f'x2="{geometry.x1 + 10:.2f}" y2="{y_for_weekday(day, geometry):.2f}" '
+        f'stroke="{palette["lane"]}" stroke-width="0.8" opacity="0.28" stroke-dasharray="1 7"/>'
+        for day in range(7)
+    )
+
     return f'''<svg xmlns="http://www.w3.org/2000/svg" width="{WIDTH}" height="{HEIGHT}" viewBox="0 0 {WIDTH} {HEIGHT}" role="img" aria-labelledby="title desc" shape-rendering="geometricPrecision">
-  <title id="title">{escape(login)} Signal Flare Strong, recent {len(display_calendar.weeks)}-week contribution calendar, {escape(start_date)} to {escape(end_date)}</title>
-  <desc id="desc">GitHub contribution activity from the latest {len(display_calendar.weeks)} weeks, {escape(start_date)} to {escape(end_date)}, arranged with weeks from left to right and weekdays from top to bottom. Larger and more strongly colored circles indicate higher contribution intensity. During the decorative satellite pass, active signals temporarily become larger circles or technical four-point flares with brighter centers, while the complete base calendar remains static and continuously visible.</desc>
+  <title id="title">{escape(login)} contribution telemetry, recent {len(display_calendar.weeks)}-week window</title>
+  <desc id="desc">GitHub contribution activity from {escape(start_date)} to {escape(end_date)}, arranged by week and weekday. Signal size and color represent contribution intensity. A decorative CubeSat performs a short telemetry pass over the matrix before a long quiet interval. The full matrix and a static ground station remain available without animation.</desc>
   <style>
     .quiet-sweep {{ transform: translateX({FALLBACK_X:.2f}px); opacity: 1; }}
-    .flare-motion {{ animation: signal-flare {SCAN_DURATION:.1f}s linear infinite; }}
+    .flare-motion {{ animation: telemetry-pass {SCAN_DURATION:.1f}s cubic-bezier(.45,.03,.55,.97) infinite; }}
     .flare-layer, .scan-cues {{ opacity: 1; }}
-    @keyframes signal-flare {{
-      0%, 0.5% {{ transform: translateX({TRAVEL_START:.2f}px); opacity: 0; visibility: hidden; }}
-      2.5% {{ transform: translateX({TRAVEL_START:.2f}px); opacity: 1; visibility: visible; }}
-      75% {{ transform: translateX({TRAVEL_END:.2f}px); opacity: 1; visibility: visible; }}
-      80%, 100% {{ transform: translateX({TRAVEL_END:.2f}px); opacity: 0; visibility: hidden; }}
+    @keyframes telemetry-pass {{
+      0%, 2% {{ transform: translateX({TRAVEL_START:.2f}px); opacity: 0; visibility: hidden; }}
+      5% {{ transform: translateX({TRAVEL_START:.2f}px); opacity: 1; visibility: visible; }}
+      31% {{ transform: translateX({TRAVEL_END:.2f}px); opacity: 1; visibility: visible; }}
+      35%, 100% {{ transform: translateX({TRAVEL_END:.2f}px); opacity: 0; visibility: hidden; }}
     }}
     @media (prefers-reduced-motion: reduce) {{
       .quiet-sweep {{ animation: none; transform: translateX({FALLBACK_X:.2f}px); opacity: 1; }}
@@ -397,25 +418,26 @@ def render_svg(calendar: Calendar, login: str, theme: str) -> str:
     }}
   </style>
   <defs>
-    <clipPath id="sf-signal-flare-strong-main" clipPathUnits="userSpaceOnUse">
+    <clipPath id="telemetry-pass-main" clipPathUnits="userSpaceOnUse">
       <rect class="flare-motion clip-motion" visibility="hidden" x="{FLARE_MAIN_X:.2f}" y="{CLIP_TOP:.2f}" width="{FLARE_MAIN_WIDTH:.2f}" height="{CLIP_BOTTOM - CLIP_TOP:.2f}" transform="translate({FALLBACK_X:.2f} 0)"/>
     </clipPath>
-    <clipPath id="sf-signal-flare-strong-core" clipPathUnits="userSpaceOnUse">
-      <rect class="flare-motion clip-motion" visibility="hidden" x="{FLARE_CORE_X:.2f}" y="{CLIP_TOP - 4:.2f}" width="{FLARE_CORE_WIDTH:.2f}" height="{CLIP_BOTTOM - CLIP_TOP + 8:.2f}" transform="translate({FALLBACK_X:.2f} 0)"/>
+    <clipPath id="telemetry-pass-core" clipPathUnits="userSpaceOnUse">
+      <rect class="flare-motion clip-motion" visibility="hidden" x="{FLARE_CORE_X:.2f}" y="{CLIP_TOP - 3:.2f}" width="{FLARE_CORE_WIDTH:.2f}" height="{CLIP_BOTTOM - CLIP_TOP + 6:.2f}" transform="translate({FALLBACK_X:.2f} 0)"/>
     </clipPath>
   </defs>
   <g aria-hidden="true">
-    <g class="terminal-markers" stroke="{palette['marker']}" stroke-width="1" opacity="0.42" vector-effect="non-scaling-stroke">
-      <circle cx="{geometry.x0:.2f}" cy="{MARKER_Y:.2f}" r="2.4" fill="none"/>
-      <path d="M{geometry.x1 - 4:.2f} {MARKER_Y:.2f}L{geometry.x1:.2f} {MARKER_Y - 4:.2f}L{geometry.x1 + 4:.2f} {MARKER_Y:.2f}L{geometry.x1:.2f} {MARKER_Y + 4:.2f}Z" fill="{palette['marker']}" stroke="none"/>
-    </g>
+    <path d="M{geometry.x0 - 4:.2f} {ORBIT_Y:.2f}H{geometry.x1 + 4:.2f}" fill="none" stroke="{palette['track']}" stroke-width="1" opacity="0.34" stroke-dasharray="2 8"/>
+    <circle cx="{geometry.x0:.2f}" cy="{ORBIT_Y:.2f}" r="2.5" fill="none" stroke="{palette['track']}" stroke-width="1" opacity="0.48"/>
+    <path d="M{geometry.x1 - 4:.2f} {ORBIT_Y:.2f}L{geometry.x1:.2f} {ORBIT_Y - 4:.2f}L{geometry.x1 + 4:.2f} {ORBIT_Y:.2f}L{geometry.x1:.2f} {ORBIT_Y + 4:.2f}Z" fill="{palette['track']}" opacity="0.58"/>
+    <g class="telemetry-lanes">{lane_markup}</g>
     <g class="signal-matrix">{base_markup}</g>
-    <g class="flare-layer flare-main" clip-path="url(#sf-signal-flare-strong-main)" opacity="0">{flare_markup}</g>
-    <g class="flare-layer flare-cores" clip-path="url(#sf-signal-flare-strong-core)" opacity="0">{core_markup}</g>
+    <g class="flare-layer flare-main" clip-path="url(#telemetry-pass-main)" opacity="0">{flare_markup}</g>
+    <g class="flare-layer flare-cores" clip-path="url(#telemetry-pass-core)" opacity="0">{core_markup}</g>
+    {render_ground_station(palette)}
     <g class="quiet-sweep flare-motion" transform="translate({FALLBACK_X:.2f} 0)" opacity="1">
       <g class="scan-cues" opacity="0">
-        <line class="scan-line" x1="0" y1="49" x2="0" y2="66" stroke="{palette['scan']}" stroke-width="1" opacity="0.48" vector-effect="non-scaling-stroke"/>
-        <path class="scan-aperture" d="M-5 55L-1.4 68M5 55L1.4 68M-4 69H4" fill="none" stroke="{palette['scan']}" stroke-width="1" stroke-linecap="round" opacity="0.52" vector-effect="non-scaling-stroke"/>
+        <line class="scan-line" x1="0" y1="{ORBIT_Y + 20:.2f}" x2="0" y2="{CLIP_TOP - 1:.2f}" stroke="{palette['scan']}" stroke-width="1.1" opacity="0.58" vector-effect="non-scaling-stroke"/>
+        <path class="scan-beam" d="M0 {ORBIT_Y + 18:.2f}L-18 {CLIP_TOP:.2f}M0 {ORBIT_Y + 18:.2f}L18 {CLIP_TOP:.2f}" fill="none" stroke="{palette['beam']}" stroke-width="0.9" stroke-linecap="round" opacity="0.30" vector-effect="non-scaling-stroke"/>
       </g>
       {render_satellite(palette)}
     </g>
@@ -428,7 +450,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--user", default=os.getenv("GITHUB_USER", "DavCalo"))
     parser.add_argument("--token", default=os.getenv("GITHUB_TOKEN"))
     parser.add_argument("--output", type=Path, default=Path("dist"))
-    parser.add_argument("--demo", action="store_true", help="Generate seeded preview data without GitHub")
+    parser.add_argument("--demo", action="store_true", help="Generate deterministic preview data")
     return parser.parse_args()
 
 
@@ -451,8 +473,9 @@ def main() -> int:
         render_svg(calendar, args.user, "dark"), encoding="utf-8"
     )
     print(
-        f"Generated recent contribution scan for {args.user}: "
-        f"{display_calendar.total} contributions across {len(display_calendar.weeks)} weeks"
+        f"Generated contribution telemetry for {args.user}: "
+        f"{display_calendar.contributions} contributions across "
+        f"{len(display_calendar.weeks)} weeks"
     )
     return 0
 

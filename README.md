@@ -2,120 +2,111 @@
 
 # Davide Calò
 
-**Engineering software where intelligence meets machines, embedded systems, and space.**
+**Systems & Embedded Software Engineering**
+
+Computer Engineering student building reliable software for embedded platforms, automation, and space systems.
 
 <p>
   <a href="https://www.linkedin.com/in/davide-cal%C3%B2-632255390">
-    <img
-      src="https://img.shields.io/badge/LinkedIn-0A66C2?style=flat-square&logo=linkedin&logoColor=white"
-      alt="LinkedIn"
-    />
+    <img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=flat-square&logo=linkedin&logoColor=white" alt="LinkedIn" />
   </a>
   <a href="mailto:calo.davide02@gmail.com">
-    <img
-      src="https://img.shields.io/badge/Email-D14836?style=flat-square&logo=gmail&logoColor=white"
-      alt="Email"
-    />
+    <img src="https://img.shields.io/badge/Email-D14836?style=flat-square&logo=gmail&logoColor=white" alt="Email" />
   </a>
-</p>
-
-<p>
-  <picture>
-    <source
-      media="(prefers-color-scheme: dark)"
-      srcset="https://raw.githubusercontent.com/DavCalo/DavCalo/output/contribution-scan-dark.svg"
-    />
-    <source
-      media="(prefers-color-scheme: light)"
-      srcset="https://raw.githubusercontent.com/DavCalo/DavCalo/output/contribution-scan.svg"
-    />
-    <img
-      src="https://raw.githubusercontent.com/DavCalo/DavCalo/output/contribution-scan.svg"
-      alt="Davide Calò Signal Flare: an animated 26-week GitHub contribution telemetry scan"
-    />
-  </picture>
-</p>
-
-<p>
-  <sub>
-    <strong>Signal Flare</strong> · A rolling 26-week view of my GitHub activity.<br />
-    Active days flare as the satellite passes.
-  </sub>
-</p>
-
-<p>
-  <sub>
-    Python · GraphQL · SVG · GitHub Actions ·
-    <a href="scripts/generate_contribution_scan.py">Source</a> ·
-    <a href=".github/workflows/contribution-scan.yml">Workflow</a>
-  </sub>
 </p>
 
 </div>
 
-I study Computer Engineering and build software that moves from algorithms into real systems—from AI and industrial automation to embedded platforms and space missions.
-
-## Current work
-
-<p>
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="assets/mip-logo-dark.png" />
-    <source media="(prefers-color-scheme: light)" srcset="assets/mip-logo-light.png" />
-    <img src="assets/mip-logo-light.png" height="28" align="middle" alt="MIP Technologies logo" />
-  </picture>
-  &nbsp;&nbsp;<strong><a href="https://www.miptechnologies.tech">MIP Technologies</a></strong>
-  · <sub>AI &amp; Software Development</sub><br />
-  Building AI-powered software and tailored digital systems.
-</p>
-
-<p>
-  <img src="assets/albasat-logo.png" height="34" align="middle" alt="AlbaSat UniPD logo" />
-  &nbsp;&nbsp;<strong>AlbaSat UniPD</strong>
-  · <sub>University CubeSat Project</sub><br />
-  Developing embedded software for a multidisciplinary CubeSat mission.
-</p>
-
-## From intelligence to orbit
+## Contribution telemetry
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="assets/systems-ribbon-dark.svg" />
-    <source media="(prefers-color-scheme: light)" srcset="assets/systems-ribbon-light.svg" />
-    <img
-      src="assets/systems-ribbon-light.svg"
-      width="100%"
-      alt="A systems ribbon connecting intelligence, machines, embedded platforms, and space"
-    />
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/DavCalo/DavCalo/output/contribution-scan-dark.svg" />
+    <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/DavCalo/DavCalo/output/contribution-scan.svg" />
+    <img src="https://raw.githubusercontent.com/DavCalo/DavCalo/output/contribution-scan.svg" width="100%" alt="Animated 26-week GitHub contribution telemetry pass" />
   </picture>
 </p>
 
 <p align="center">
-  <sub>Software carries ideas from intelligent applications into machines, embedded platforms, and space systems.</sub>
+  <sub>
+    A rolling 26-week activity window generated with
+    <a href="scripts/generate_contribution_scan.py">Python</a>, GitHub GraphQL, SVG, and GitHub Actions.
+  </sub>
 </p>
 
-## Engineering toolkit
+## Flagship project
 
-<p>
-  <strong>Languages</strong><br />
-  <code>C</code> <code>C++</code> <code>Java</code> <code>Python</code> <code>SQL</code>
-</p>
+### [OrbitOps](https://github.com/DavCalo/OrbitOps)
 
-<p>
-  <strong>Industrial robotics</strong><br />
-  <code>KUKA / KRL</code> <code>Comau / PDL2</code> <code>Epson / SPEL+</code>
-</p>
+A dependency-light CubeSat telemetry platform that makes the complete path from on-board packet generation to ground-station inspection concrete and reproducible.
 
-<p>
-  <strong>Observability &amp; infrastructure</strong><br />
-  <code>Git</code> <code>GitHub Actions</code> <code>Terraform</code> <code>Datadog</code>
-</p>
+```text
+C++ on-board simulator → deterministic UDP link → Python ground station
+```
+
+- **Deterministic fault injection** — seeded packet loss, latency, jitter, duplication, corruption, and reordering.
+- **Auditable telemetry** — versioned packet, mission-profile, alarm-policy, event-log, and report contracts.
+- **Engineering assurance** — cross-platform CI, sanitizers, typing, coverage, parser mutation tests, packaging, and installed demos.
+
+`C++17` · `Python` · `UDP` · `CMake` · `TOML` · `GitHub Actions`
+
+[Explore the repository](https://github.com/DavCalo/OrbitOps) · [Read the architecture](https://github.com/DavCalo/OrbitOps/blob/main/docs/architecture.md) · [Run the flagship demo](https://github.com/DavCalo/OrbitOps#quick-start)
+
+## Currently working on
+
+<table>
+  <tr>
+    <td width="50%" valign="top">
+      <strong>AlbaSat UniPD</strong><br />
+      <sub>University CubeSat project</sub>
+      <br /><br />
+      Developing embedded software for a multidisciplinary CubeSat mission.
+    </td>
+    <td width="50%" valign="top">
+      <strong><a href="https://www.miptechnologies.tech">MIP Technologies</a></strong><br />
+      <sub>AI &amp; software development</sub>
+      <br /><br />
+      Building AI-powered applications and tailored software systems.
+    </td>
+  </tr>
+</table>
+
+## Engineering focus
+
+<table>
+  <tr>
+    <td width="33%" valign="top">
+      <strong>Systems &amp; embedded</strong><br /><br />
+      <code>C</code> <code>C++</code><br />
+      Binary protocols<br />
+      Networking<br />
+      CMake
+    </td>
+    <td width="33%" valign="top">
+      <strong>Software engineering</strong><br /><br />
+      <code>Python</code> <code>Java</code><br />
+      Testing<br />
+      API design<br />
+      GitHub Actions
+    </td>
+    <td width="33%" valign="top">
+      <strong>Automation &amp; infrastructure</strong><br /><br />
+      Industrial robotics<br />
+      Terraform<br />
+      Datadog<br />
+      Git
+    </td>
+  </tr>
+</table>
 
 ---
 
 <div align="center">
 
-**Let's build systems that move beyond the screen.**
+### Let's build reliable systems
 
-Open to exchanging ideas and collaborating on intelligent software, automation, embedded engineering, and space systems.
+Interested in embedded software, telemetry, automation, and software that interacts with the physical world.
+
+[LinkedIn](https://www.linkedin.com/in/davide-cal%C3%B2-632255390) · [Email](mailto:calo.davide02@gmail.com)
 
 </div>
